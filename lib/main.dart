@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -24,92 +28,138 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      //home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      //home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: CatFactsScreen.routename,
+      routes: {
+        // '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
+
+        CatFactsScreen.routename : (context) => CatFactsScreen(),
+      },
+      debugShowCheckedModeBanner: false, // no longuer ddebugging flag in the app!!
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class Meal {
+  Meal.fromJson(Map<String, dynamic> json)
+      : weekDay = json['weekDay'] ?? '',
+        soup = json['soup'] ?? '',
+        fish = json['fish'] ?? '',
+        meat = json['meat'] ?? '',
+        vegetarian = json['vegetarian'] ?? '',
+        dessert = json['dessert'] ?? '';
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  final String weekDay;
+  final String soup;
+  final String fish;
+  final String meat;
+  final String vegetarian;
+  final String dessert;
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+
+class CatFactsScreen extends StatefulWidget {
+  const CatFactsScreen({Key? key}) : super(key: key);
+
+  static const String routename = '/CatFactsScreen';
+
+  @override
+  State<CatFactsScreen> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<CatFactsScreen> {
+
+  static const String _catFactsUrl = 'http://amov.servehttp.com:8080/menu'; // 'http://amov.servehttp.com:8080/menu'; //'http://0.0.0.0:8080/menu'; // 'https://catfact.ninja/facts';
+
+  Future<String> _fetchAnAsyncString() async {
+    // Simula um pedido de 5 segundos
+    await Future.delayed(const Duration(seconds: 5));
+    return Future.value('Hello world, from an aysnc call!');
+  }
+
+
+  List<Meal>? _meals = [];
+  bool _fetchingData = false;
+  Future<void> _fetchCatFacts() async {
+    try {
+      setState(() => _fetchingData = true);
+      http.Response response = await http.get(Uri.parse(_catFactsUrl));
+      if (response.statusCode == HttpStatus.ok) {
+        debugPrint(response.body);
+        // final Map<String, dynamic> decodedData = json.decode(response.body);
+
+        /*
+        final Map<String, dynamic> mealsData = json.decode(response.body);
+        setState(() => _meals = mealsData.entries
+            .map((mealData) => Meal.fromJson(mealData.value)).toList());
+         */
+
+        final mealsData = json.decode(response.body);
+        final meals = <Meal>[];
+        mealsData.forEach((weekDay, data) {
+          final meal = Meal.fromJson(data['original']);
+          meals.add(meal);
+        });
+        setState(() => _meals = meals);
+
+      }
+    } catch (e) {
+      debugPrint('Something went wrong: $e');
+    } finally {
+      setState(() => _fetchingData = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Cat Facts'),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Teste'),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: _fetchCatFacts,
+                child: const Text('Fetch cat facts'),
+              ),
+              if (_fetchingData) const CircularProgressIndicator(),
+              if (!_fetchingData && _meals != null && _meals!.isNotEmpty)
+                Flexible(
+                  child: ListView.builder(
+                    //itemCount: json.keys.length,
+                    itemCount: _meals!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final Meal meal = _meals![index];
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(meal.weekDay),
+                              Text('Soup: ${meal.soup}'),
+                              Text('Fish: ${meal.fish}'),
+                              Text('Meat: ${meal.meat}'),
+                              Text('Vegetarian: ${meal.vegetarian}'),
+                              Text('Dessert: ${meal.dessert}'),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+
+                  ),
+                ),
+            ],
+          )
+
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
 }
