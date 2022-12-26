@@ -48,7 +48,7 @@ class Meal {
         fish = json['fish'] ?? '',
         meat = json['meat'] ?? '',
         vegetarian = json['vegetarian'] ?? '',
-        desert = json['dessert'] ?? '';
+        desert = json['desert'] ?? '';
 
   final String weekDay;
   final String soup;
