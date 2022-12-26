@@ -116,14 +116,15 @@ class _MyHomePageState extends State<CatFactsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cat Facts'),
+        title: const Text('Cafeteria Meals'),
       ),
       body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Teste'),
+              const Text('Cafeteria Meals'),
               const SizedBox(height: 20.0),
+
               ElevatedButton(
                 onPressed: _fetchCatFacts,
                 child: const Text('Fetch cat facts'),
