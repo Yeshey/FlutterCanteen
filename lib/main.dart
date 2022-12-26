@@ -48,14 +48,14 @@ class Meal {
         fish = json['fish'] ?? '',
         meat = json['meat'] ?? '',
         vegetarian = json['vegetarian'] ?? '',
-        dessert = json['dessert'] ?? '';
+        desert = json['dessert'] ?? '';
 
   final String weekDay;
   final String soup;
   final String fish;
   final String meat;
   final String vegetarian;
-  final String dessert;
+  final String desert;
 }
 
 
@@ -146,7 +146,7 @@ class _MyHomePageState extends State<CatFactsScreen> {
                               Text('Fish: ${meal.fish}'),
                               Text('Meat: ${meal.meat}'),
                               Text('Vegetarian: ${meal.vegetarian}'),
-                              Text('Dessert: ${meal.dessert}'),
+                              Text('Dessert: ${meal.desert}'),
                             ],
                           ),
                         ),
