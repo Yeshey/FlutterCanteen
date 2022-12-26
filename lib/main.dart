@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'meal_details.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
         // '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
 
         MealChooserScreen.routename : (context) => MealChooserScreen(),
+        MealDetails.routname : (context) => MealDetails(),
       },
       debugShowCheckedModeBanner: false, // no longuer debugging flag in the app!!
     );
@@ -69,13 +72,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       http.Response response = await http.get(Uri.parse(_catFactsUrl));
       if (response.statusCode == HttpStatus.ok) {
         debugPrint(response.body);
-        // final Map<String, dynamic> decodedData = json.decode(response.body);
-
-        /*
-        final Map<String, dynamic> mealsData = json.decode(response.body);
-        setState(() => _meals = mealsData.entries
-            .map((mealData) => Meal.fromJson(mealData.value)).toList());
-         */
 
         final mealsData = json.decode(response.body);
         final meals = <Meal>[];
@@ -116,6 +112,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
               if (!_fetchingData && _meals != null && _meals!.isNotEmpty)
                 Flexible(
                   child: ListView.builder(
+
                     //itemCount: json.keys.length,
                     itemCount: _meals!.length,
                     itemBuilder: (BuildContext context, int index) {
@@ -131,17 +128,23 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                               Text('Meat: ${meal.meat}'),
                               Text('Vegetarian: ${meal.vegetarian}'),
                               Text('Dessert: ${meal.desert}'),
+                              ElevatedButton(
+                                  onPressed: () => Navigator.pushNamed( // You could call a function, with () => you are defining the function in place
+                                    context,
+                                    MealDetails.routname,
+                                    arguments: 5,
+                                  ),
+                                  child: Text('Meal Details')
+                              ),
                             ],
                           ),
                         ),
                       );
                     },
-
                   ),
                 ),
             ],
           )
-
       ),
     );
   }
