@@ -129,10 +129,10 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                               Text('Vegetarian: ${meal.vegetarian}'),
                               Text('Dessert: ${meal.desert}'),
                               ElevatedButton(
-                                  onPressed: () => Navigator.pushNamed( // You could call a function, with () => you are defining the function in place
+                                  onPressed: () => Navigator.pushNamed( // if you could call a function with () => you are defining the function in place
                                     context,
                                     MealDetails.routname,
-                                    arguments: 5,
+                                    arguments: meal,
                                   ),
                                   child: Text('Meal Details')
                               ),
