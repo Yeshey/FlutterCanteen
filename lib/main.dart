@@ -103,13 +103,13 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cafeteria Meals'),
+        title: const Text('Canteen Meals'),
       ),
       body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Cafeteria Meals'),
+              const Text('Canteen Meals'),
               const SizedBox(height: 20.0),
 
               if (_fetchingData) const CircularProgressIndicator(),
