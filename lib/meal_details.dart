@@ -30,20 +30,37 @@ class _MealDetailsState extends State<MealDetails> {
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 200,
-            child: Image.asset('images/ahh.jpg'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt),
+                      onPressed: () {
+                        // TODO: Add code to handle camera button press
+                      },
+                    ),
+                    Hero(
+                      tag: 'AmovTag1',
+                      child: Text('Change Meal Image'),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                height: 200,
+                child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
+              ),
+            ],
           ),
           Container(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.camera_alt),
-                  onPressed: () {
-                    // TODO: Add code to handle camera button press
-                  },
-                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,10 +82,6 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ],
             ),
-          ),
-          Hero(
-            tag: 'AmovTag1',
-            child: Text('Valor = what'), // $counter
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

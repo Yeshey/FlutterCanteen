@@ -76,7 +76,12 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
         final mealsData = json.decode(response.body);
         final meals = <Meal>[];
         mealsData.forEach((weekDay, data) {
-          final meal = Meal.fromJson(data['original']);
+          final Meal meal;
+          if (data['update'] == null){
+            meal = Meal.fromJson(data['original']);
+          } else {
+            meal = Meal.fromJson(data['update']);
+          }
           meals.add(meal);
         });
         setState(() => _meals = meals);
