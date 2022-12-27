@@ -59,27 +59,52 @@ class _MealDetailsState extends State<MealDetails> {
           ),
           Container(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
+            child: Row( //  todo need to make them be in a Column not a row now
               children: [
+
+                if(meal.thereIsAnUpdatedMeal)...[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ementa Atualizada',
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text('Sopa: ${meal.updatedSoup}'),
+                        Text('Prato Peixe: ${meal.updatedFish}'),
+                        Text('Prato Carne: ${meal.updatedMeat}'),
+                        Text('Prato Vegetariano: ${meal.updatedVegetarian}'),
+                        Text('Sobremesa: ${meal.updatedDessert}'),
+                      ],
+                    ),
+                  ),
+                ],
+
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Ementa Atualizada',
-                        style: const TextStyle(
+                      const Text(
+                        'Ementa Original',
+                        style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text('Sopa: ${meal.soup}'),
-                      Text('Prato Peixe: ${meal.fish}'),
-                      Text('Prato Carne: ${meal.meat}'),
-                      Text('Prato Vegetariano: ${meal.vegetarian}'),
-                      Text('Sobremesa: ${meal.desert}'),
+                      Text('Sopa: ${meal.originalSoup}'),
+                      Text('Prato Peixe: ${meal.originalFish}'),
+                      Text('Prato Carne: ${meal.originalMeat}'),
+                      Text('Prato Vegetariano: ${meal.originalVegetarian}'),
+                      Text('Sobremesa: ${meal.originalDessert}'),
                     ],
                   ),
                 ),
+
               ],
             ),
           ),

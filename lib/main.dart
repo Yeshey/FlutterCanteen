@@ -35,20 +35,35 @@ class MyApp extends StatelessWidget {
 }
 
 class Meal {
-  Meal.fromJson(Map<String, dynamic> json)
-      : weekDay = json['weekDay'] ?? '',
-        soup = json['soup'] ?? '',
-        fish = json['fish'] ?? '',
-        meat = json['meat'] ?? '',
-        vegetarian = json['vegetarian'] ?? '',
-        desert = json['desert'] ?? '';
 
+  Meal.fromJson(Map<String, dynamic> json, bool recUpdatedMeal)
+      : weekDay = json['original']?['weekDay'] ?? '',
+        originalSoup = json['original']?['soup'] ?? '',
+        originalFish = json['original']?['fish'] ?? '',
+        originalMeat = json['original']?['meat'] ?? '',
+        originalVegetarian = json['original']?['vegetarian'] ?? '',
+        originalDessert = json['original']?['desert'] ?? '',
+        updatedSoup = json['update']?['soup'] ?? '',
+        updatedFish = json['update']?['fish'] ?? '',
+        updatedMeat = json['update']?['meat'] ?? '',
+        updatedVegetarian = json['update']?['vegetarian'] ?? '',
+        updatedDessert = json['update']?['desert'] ?? '',
+        submitted = json['submitted'] ?? false,
+        thereIsAnUpdatedMeal = recUpdatedMeal;
+
+  final bool thereIsAnUpdatedMeal;
   final String weekDay;
-  final String soup;
-  final String fish;
-  final String meat;
-  final String vegetarian;
-  final String desert;
+  final String originalSoup;
+  final String originalFish;
+  final String originalMeat;
+  final String originalVegetarian;
+  final String originalDessert;
+  final String updatedSoup;
+  final String updatedFish;
+  final String updatedMeat;
+  final String updatedVegetarian;
+  final String updatedDessert;
+  final bool submitted;
 }
 
 class MealChooserScreen extends StatefulWidget {
@@ -73,15 +88,13 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       if (response.statusCode == HttpStatus.ok) {
         debugPrint(response.body);
 
-        final mealsData = json.decode(response.body);
         final meals = <Meal>[];
-        mealsData.forEach((weekDay, data) {
-          final Meal meal;
-          if (data['update'] == null){
-            meal = Meal.fromJson(data['original']);
-          } else {
-            meal = Meal.fromJson(data['update']);
+        bool updatedMeal = true;
+        json.decode(response.body).forEach((weekDay, data) {
+          if (data['update'] == null) {
+            updatedMeal = false;
           }
+          final meal = Meal.fromJson(data,updatedMeal);
           meals.add(meal);
         });
         setState(() => _meals = meals);
@@ -128,11 +141,33 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                           child: Column(
                             children: [
                               Text(meal.weekDay),
-                              Text('Soup: ${meal.soup}'),
-                              Text('Fish: ${meal.fish}'),
-                              Text('Meat: ${meal.meat}'),
-                              Text('Vegetarian: ${meal.vegetarian}'),
-                              Text('Dessert: ${meal.desert}'),
+
+                              Column(
+                                children: [
+                                  if(meal.thereIsAnUpdatedMeal)...[
+                                    Text('Soup: ${meal.updatedSoup}'),
+                                    Text('Fish: ${meal.updatedFish}'),
+                                    Text('Meat: ${meal.updatedMeat}'),
+                                    Text('Vegetarian: ${meal.updatedVegetarian}'),
+                                    Text('Dessert: ${meal.updatedDessert}'),
+                                  ]else...[
+                                    Text('Soup: ${meal.originalSoup}'),
+                                    Text('Fish: ${meal.originalFish}'),
+                                    Text('Meat: ${meal.originalMeat}'),
+                                    Text('Vegetarian: ${meal.originalVegetarian}'),
+                                    Text('Dessert: ${meal.originalDessert}'),
+                                  ]
+                                ]),
+
+
+                              /*Text('Soup: ${meal.updatedSoup}'),
+                              Text('Fish: ${meal.updatedFish}'),
+                              Text('Meat: ${meal.updatedMeat}'),
+                              Text('Vegetarian: ${meal.updatedVegetarian}'),
+                              Text('Dessert: ${meal.updatedDessert}'),
+                              */
+
+
                               ElevatedButton(
                                   onPressed: () => Navigator.pushNamed( // if you could call a function with () => you are defining the function in place
                                     context,
