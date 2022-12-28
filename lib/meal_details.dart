@@ -14,8 +14,6 @@ class MealDetails extends StatefulWidget {
 class _MealDetailsState extends State<MealDetails> {
 
   bool _isEnable = false; //_isEnable is the boolean variable and set it false, so we have to make it true when user tap on text
-  TextEditingController _controller = TextEditingController(text: 'Wong Yuk Hei');
-  bool isReadOnly = true;
 
   late final Meal meal = ModalRoute.of(context)!.settings.arguments as Meal;
 
