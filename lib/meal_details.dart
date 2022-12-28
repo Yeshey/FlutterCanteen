@@ -32,7 +32,9 @@ class _MealDetailsState extends State<MealDetails> {
           ),
         ),
       ),
-      body: Column(
+      body: SingleChildScrollView(
+        //child: Stack(
+        child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -71,36 +73,26 @@ class _MealDetailsState extends State<MealDetails> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Ementa Atualizada',
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
 
-/*
-                        Text('Sopa: ${meal.updatedSoup}\n'),
-                        Text('Prato Peixe: ${meal.updatedFish}\n'),
-                        Text('Prato Carne: ${meal.updatedMeat}\n'),
-                        Text('Prato Vegetariano: ${meal.updatedVegetarian}\n'),
-                        Text('Sobremesa: ${meal.updatedDessert}\n'),
- */
-
-                        const Text('Sopa: '),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: <Widget> [
                                 Expanded(
-                                    child: TextFormField(
-                                        initialValue: '${meal.updatedSoup}',
-                                        //controller: _controller,
-                                        enabled: _isEnable,
-                                        minLines: 1,
-                                        maxLines: 5,
-                                    )
+                                  child: Text(
+                                    'Ementa Atualizada',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // TODO: Add code to handle "Repor" button press
+                                  },
+                                  child: const Text('Repor'),
                                 ),
                                 IconButton(
                                     icon: Icon(Icons.edit),
@@ -112,114 +104,52 @@ class _MealDetailsState extends State<MealDetails> {
                               ],
                             )
                           ],
+                        ),
+
+
+                        const Text('Sopa: '),
+                        TextFormField(
+                          initialValue: '${meal.updatedSoup}',
+                          //controller: _controller,
+                          enabled: _isEnable,
+                          minLines: 1,
+                          maxLines: 5,
                         ),
 
                         const Text('Prato Peixe: '),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: <Widget> [
-                                Expanded(
-                                    child: TextFormField(
-                                      initialValue: '${meal.updatedFish}',
-                                      //controller: _controller,
-                                      enabled: _isEnable,
-                                      minLines: 1,
-                                      maxLines: 5,
-                                    )
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      setState (() {
-                                        _isEnable = true;
-                                      });
-                                    }),
-                              ],
-                            )
-                          ],
+                        TextFormField(
+                          initialValue: '${meal.updatedFish}',
+                          //controller: _controller,
+                          enabled: _isEnable,
+                          minLines: 1,
+                          maxLines: 5,
                         ),
 
                         const Text('Prato Carne: '),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: <Widget> [
-                                Expanded(
-                                    child: TextFormField(
-                                      initialValue: '${meal.updatedMeat}',
-                                      //controller: _controller,
-                                      enabled: _isEnable,
-                                      minLines: 1,
-                                      maxLines: 5,
-                                    )
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      setState (() {
-                                        _isEnable = true;
-                                      });
-                                    }),
-                              ],
-                            )
-                          ],
+                        TextFormField(
+                          initialValue: '${meal.updatedMeat}',
+                          //controller: _controller,
+                          enabled: _isEnable,
+                          minLines: 1,
+                          maxLines: 5,
                         ),
 
                         const Text('Prato Vegetariano: '),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: <Widget> [
-                                Expanded(
-                                    child: TextFormField(
-                                      initialValue: '${meal.updatedVegetarian}',
-                                      //controller: _controller,
-                                      enabled: _isEnable,
-                                      minLines: 1,
-                                      maxLines: 5,
-                                    )
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      setState (() {
-                                        _isEnable = true;
-                                      });
-                                    }),
-                              ],
-                            )
-                          ],
+                        TextFormField(
+                          initialValue: '${meal.updatedVegetarian}',
+                          //controller: _controller,
+                          enabled: _isEnable,
+                          minLines: 1,
+                          maxLines: 5,
                         ),
 
-                        const Text('Sobremesa: '),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: <Widget> [
-                                Expanded(
-                                    child: TextFormField(
-                                      initialValue: '${meal.updatedDessert}',
-                                      //controller: _controller,
-                                      enabled: _isEnable,
-                                      minLines: 1,
-                                      maxLines: 5,
-                                    )
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      setState (() {
-                                        _isEnable = true;
-                                      });
-                                    }),
-                              ],
-                            )
-                          ],
+                        const Text('\nSobremesa: '),
+                        TextFormField(
+                          initialValue: '${meal.updatedDessert}',
+                          //controller: _controller,
+                          enabled: _isEnable,
+                          minLines: 1,
+                          maxLines: 5,
                         ),
 
 
@@ -229,46 +159,64 @@ class _MealDetailsState extends State<MealDetails> {
                 ],
 
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Ementa Original',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text('Sopa: ${meal.originalSoup}\n'),
-                      Text('Prato Peixe: ${meal.originalFish}\n'),
-                      Text('Prato Carne: ${meal.originalMeat}\n'),
-                      Text('Prato Vegetariano: ${meal.originalVegetarian}\n'),
-                      Text('Sobremesa: ${meal.originalDessert}\n'),
-                    ],
-                  ),
-                ),
+
+
 
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Add code to handle "Repor" button press
-                },
-                child: const Text('Repor'),
+
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: <Widget> [
+                          Expanded(
+                            child: Text(
+                              'Ementa Original',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // TODO: Add code to handle "Repor" button press
+                            },
+                            child: const Text('Repor'),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                setState (() {
+                                  _isEnable = true;
+                                });
+                              }),
+                        ],
+                      )
+                    ],
+                  ),
+
+
+                  Text('Sopa: ${meal.originalSoup}\n'),
+                  Text('Prato Peixe: ${meal.originalFish}\n'),
+                  Text('Prato Carne: ${meal.originalMeat}\n'),
+                  Text('Prato Vegetariano: ${meal.originalVegetarian}\n'),
+                  Text('Sobremesa: ${meal.originalDessert}\n'),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Add code to handle "Editar" button press
-                },
-                child: const Text('Editar'),
-              ),
-            ],
+            ),
           ),
+
           SizedBox(height: 8.0),
           ElevatedButton(
             onPressed: () {
@@ -277,7 +225,9 @@ class _MealDetailsState extends State<MealDetails> {
             child: const Text('Submeter'),
           ),
         ],
+        )
       ),
+      //),
     );
   }
 

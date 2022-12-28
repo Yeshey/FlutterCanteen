@@ -123,7 +123,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Canteen Meals'),
               const SizedBox(height: 20.0),
 
               if (_fetchingData) const CircularProgressIndicator(),
