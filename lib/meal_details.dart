@@ -61,9 +61,31 @@ class _MealDetailsState extends State<MealDetails> {
               ),
             ],
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Add code to handle "Repor" button press
+                },
+                child: const Text('Repor'),
+              ),
+              IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    setState (() {
+                      _isEnable = true;
+                    });
+                  }),
+            ],
+          ),
+
+
           Container(
             padding: const EdgeInsets.all(8.0),
-            child: Row( //  todo need to make them be in a Column not a row now
+            child: Row(
+
               children: [
 
                 if(meal.thereIsAnUpdatedMeal)...[
@@ -86,19 +108,6 @@ class _MealDetailsState extends State<MealDetails> {
                                     ),
                                   ),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // TODO: Add code to handle "Repor" button press
-                                  },
-                                  child: const Text('Repor'),
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      setState (() {
-                                        _isEnable = true;
-                                      });
-                                    }),
                               ],
                             )
                           ],
@@ -186,19 +195,6 @@ class _MealDetailsState extends State<MealDetails> {
                               ),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // TODO: Add code to handle "Repor" button press
-                            },
-                            child: const Text('Repor'),
-                          ),
-                          IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {
-                                setState (() {
-                                  _isEnable = true;
-                                });
-                              }),
                         ],
                       )
                     ],
