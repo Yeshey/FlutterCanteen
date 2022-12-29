@@ -94,7 +94,9 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
         final meals = <Meal>[];
         bool updatedMeal = true;
-        json.decode(response.body).forEach((weekDay, data) { //utf8?
+
+
+        json.decode(utf8.decode(response.bodyBytes)).forEach((weekDay, data) {
           if (data['update'] == null) {
             updatedMeal = false;
           }
