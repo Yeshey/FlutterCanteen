@@ -83,14 +83,19 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
   List<Meal>? _meals = [];
   bool _anyMealsToShow = true;
-  bool _fetchingData = false;
+  bool _fetchingData = true;
+  // final meals = <Meal>[];
   Future<void> _fetchMeals() async {
     try {
       setState(() => _fetchingData = true);
+      setState(() => _anyMealsToShow = true);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       http.Response response = await http.get(Uri.parse(_catFactsUrl));
 
       if (response.statusCode == HttpStatus.ok) {
         debugPrint(response.body);
+
+        prefs.setString('storedMeals', response.body);
 
         final meals = <Meal>[];
         bool updatedMeal = true;
@@ -116,38 +121,44 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
   Future<void> _fetchLocalMeals() async {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('storedMeals') != null){
-      // Extract the local data
+    //final success = await prefs.remove('storedMeals');
 
-      try {
+    try {
+
         setState(() => _fetchingData = true);
 
-        _anyMealsToShow = true;
+        if (prefs.containsKey('storedMeals') == true){
+            // Extract the local data
 
-        final String responseBody = prefs.getString('storedMeals');
+          _anyMealsToShow = true;
 
-        debugPrint(responseBody);
+          final String responseBody = prefs.getString('storedMeals');
 
-        final meals = <Meal>[];
-        bool updatedMeal = true;
-        json.decode(responseBody).forEach((weekDay, data) { //utf8?
-          if (data['update'] == null) {
-            updatedMeal = false;
-          }
-          final meal = Meal.fromJson(data,updatedMeal);
-          meals.add(meal);
-        });
-        setState(() => _meals = meals);
+          debugPrint(responseBody);
+
+          final meals = <Meal>[];
+          bool updatedMeal = true;
+          json.decode(responseBody).forEach((weekDay, data) { //utf8?
+            if (data['update'] == null) {
+              updatedMeal = false;
+            }
+            final meal = Meal.fromJson(data,updatedMeal);
+            meals.add(meal);
+          });
+          setState(() => _meals = meals);
+
+        } else {
+          // Show, No meals screen
+          setState(() => _anyMealsToShow = false);
+        }
+
       } catch (e) {
         debugPrint('Something went wrong: $e');
       } finally {
         setState(() => _fetchingData = false);
       }
 
-    } else {
-      // Show, No meals screen
-      _anyMealsToShow = false;
-    }
+
 
   }
 
@@ -155,15 +166,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
   void initState() {
     super.initState();
     _fetchLocalMeals();
-
-    /*
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      http.Response response = await http.get(Uri.parse(_catFactsUrl));
-      prefs.setString('storedMeals', response.body);
-      bool CheckValue = prefs.containsKey('storedMeals');
-    */
-    
   }
 
   @override
@@ -173,7 +175,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
         leading: IconButton(
           icon: const Icon(Icons.refresh),
           onPressed: () {
-            _fetchLocalMeals();
+            _fetchMeals();
           },
         ),
         title: const Text('Canteen Meals'),
@@ -185,14 +187,9 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
               const SizedBox(height: 20.0),
 
 
-              if (!_anyMealsToShow)...[
-                Text("No meals to show"),
-              ]else...[
-
-
-
               if (_fetchingData) const CircularProgressIndicator(),
-              if (!_fetchingData && _meals != null && _meals!.isNotEmpty)
+
+              if (_anyMealsToShow && !_fetchingData && _meals != null && _meals!.isNotEmpty)...[
                 Flexible(
                   child: ListView.builder(
 
@@ -239,6 +236,12 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                   ),
                 ),
 
+              ]else...[
+                if (!_fetchingData)
+                  Text(
+                    "No meals to show",
+                    textScaleFactor: 2,
+                  ),
               ],
 
             ],
