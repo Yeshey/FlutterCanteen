@@ -6,6 +6,7 @@ import 'main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:camera/camera.dart';
 
 
 class MealDetails extends StatefulWidget {
@@ -33,6 +34,11 @@ class _MealDetailsState extends State<MealDetails> {
   String _submitErrorMessage = '';
 
   late Meal meal;
+
+  late List<CameraDescription> cameras;
+
+
+
 
   Future<void> _submitChanges() async {
     setState(() {
@@ -127,6 +133,20 @@ class _MealDetailsState extends State<MealDetails> {
     _vegetarianController.text = meal.updatedVegetarian;
     _dessertController.text = meal.updatedDessert;
     // final int? counter = ModalRoute.of(context).settings.arguments;
+
+    final cameraController = CameraController(
+      cameras[0],
+      ResolutionPreset.medium,
+    );
+
+    try {
+      cameraController.initialize();
+    } on CameraException catch (e) {
+      debugPrint(e.code);
+      debugPrint(e.description);
+    }
+    final path = 'path/to/save/image.jpg';
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
@@ -145,17 +165,20 @@ class _MealDetailsState extends State<MealDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                     IconButton(
                       icon: const Icon(Icons.camera_alt),
-                      onPressed: () {
-                        // TODO: Add code to handle camera button press
+                      onPressed: () async {
+
+                        await cameraController.takePicture(path);
                       },
                     ),
+                    CameraPreview(cameraController),
+                    Image.file(File(path)),
                     Hero(
-                      tag: 'AmovTag1',
+                    tag: 'AmovTag1',
                       child: Text('Change Meal Image'),
                     ),
                   ],
