@@ -248,13 +248,17 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                 ]),
 
                               ElevatedButton(
-                                  onPressed: () => Navigator.pushNamed( // if you could call a function with () => you are defining the function in place
+                                onPressed: () async {
+                                  final result = await Navigator.pushNamed(
                                     context,
                                     MealDetails.routname,
                                     arguments: meal,
-                                  ),
-                                  child: Text('Meal Details')
+                                  );
+                                  // Do something with the result
+                                },
+                                child: Text('Meal Details'),
                               ),
+
                             ],
                           ),
                         ),

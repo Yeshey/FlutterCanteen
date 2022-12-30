@@ -31,28 +31,6 @@ class _MealDetailsState extends State<MealDetails> {
   bool _submitting = false;
   bool _submitSuccess = false;
   String _submitErrorMessage = '';
-/*
-  late final Meal meal = ModalRoute.of(context)!.settings.arguments as Meal;
-  //late final Meal meal;
-
-  @override
-  void initState() {
-    super.initState();
-    //meal = ModalRoute.of(context)!.settings.arguments as Meal;
-    _soupController.text = meal.updatedSoup;
-    _fishController.text = meal.updatedFish;
-    _meatController.text = meal.updatedMeat;
-    _vegetarianController.text = meal.updatedVegetarian;
-    _dessertController.text = meal.updatedDessert;
-  }
-*/
-  /*_MealDetailsState() {
-    _soupController.text = meal.updatedSoup;
-    _fishController.text = meal.updatedFish;
-    _meatController.text = meal.updatedMeat;
-    _vegetarianController.text = meal.updatedVegetarian;
-    _dessertController.text = meal.updatedDessert;
-  }*/
 
   late Meal meal;
 
@@ -63,47 +41,73 @@ class _MealDetailsState extends State<MealDetails> {
       _submitErrorMessage = '';
     });
     try {
-      final updatedMeal = Meal(
-        thereIsAnUpdatedMeal: true,
-        weekDay: meal.weekDay,
-        originalSoup: meal.originalSoup,
-        originalFish: meal.originalFish,
-        originalMeat: meal.originalMeat,
-        originalVegetarian: meal.originalVegetarian,
-        originalDessert: meal.originalDessert,
-        updatedSoup: _soupController.text,
-        updatedFish: _fishController.text,
-        updatedMeat: _meatController.text,
-        updatedVegetarian: _vegetarianController.text,
-        updatedDessert: _dessertController.text,
-        submitted: false,
-      );
+      Meal updatedMeal;
+      if (!_revertToOriginal){
+        updatedMeal = Meal(
+          thereIsAnUpdatedMeal: true,
+          weekDay: meal.weekDay,
+          originalSoup: meal.originalSoup,
+          originalFish: meal.originalFish,
+          originalMeat: meal.originalMeat,
+          originalVegetarian: meal.originalVegetarian,
+          originalDessert: meal.originalDessert,
+          updatedSoup: _soupController.text,
+          updatedFish: _fishController.text,
+          updatedMeat: _meatController.text,
+          updatedVegetarian: _vegetarianController.text,
+          updatedDessert: _dessertController.text,
+          submitted: false,
+        );
+      } else {
+        updatedMeal = Meal(
+          thereIsAnUpdatedMeal: true,
+          weekDay: meal.weekDay,
+          originalSoup: meal.originalSoup,
+          originalFish: meal.originalFish,
+          originalMeat: meal.originalMeat,
+          originalVegetarian: meal.originalVegetarian,
+          originalDessert: meal.originalDessert,
+          updatedSoup: "",
+          updatedFish: "",
+          updatedMeat: "",
+          updatedVegetarian: "",
+          updatedDessert: "",
+          submitted: false,
+        );
+      }
 
-      final uri = Uri.parse('http://amov.servehttp.com:8080/menu/${meal.weekDay}/update');
+      final uri = Uri.parse('http://amov.servehttp.com:8080/menu');
       final response = await http.post(
         uri,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: json.encode({
-          'soup': updatedMeal.updatedSoup,
-          'fish': updatedMeal.updatedFish,
-          'meat': updatedMeal.updatedMeat,
-          'vegetarian': updatedMeal.updatedVegetarian,
-          'dessert': updatedMeal.updatedDessert,
-        }),
+        body: jsonEncode(
+            {
+              "img": null,
+              "weekDay": updatedMeal.weekDay,
+              "soup": updatedMeal.updatedSoup,
+              "fish": updatedMeal.updatedFish,
+              "meat": updatedMeal.updatedMeat,
+              "vegetarian": updatedMeal.updatedVegetarian,
+              "desert": updatedMeal.updatedDessert,
+            }),
       );
+
+
 
       if (response.statusCode == HttpStatus.ok) {
         setState(() {
           _submitting = false;
           _submitSuccess = true;
+          _submitErrorMessage = utf8.decode(response.bodyBytes);
         });
         Navigator.of(context).pop();
+
       } else {
         setState(() {
           _submitting = false;
-          _submitErrorMessage = response.body;
+          _submitErrorMessage = utf8.decode(response.bodyBytes);
         });
       }
     } catch (e) {
@@ -197,6 +201,15 @@ class _MealDetailsState extends State<MealDetails> {
               children: [
 
                 if(_isVisible && (meal.thereIsAnUpdatedMeal || _isEditable))...[
+                  if(meal.originalSoup != meal.updatedSoup ||
+                      meal.originalFish != meal.updatedFish ||
+                      meal.originalMeat != meal.updatedMeat ||
+                      meal.originalVegetarian != meal.updatedVegetarian ||
+                      meal.originalDessert != meal.updatedDessert ||
+                      _isEditable
+                  )...[
+
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,62 +234,71 @@ class _MealDetailsState extends State<MealDetails> {
                           ],
                         ),
 
+                        if (meal.originalSoup != meal.updatedSoup || _isEditable)...[
+                          const Text('Sopa: '),
+                          TextFormField(
+                            controller: _soupController,
+                            //initialValue: '${meal.updatedSoup}',
+                            //controller: _controller,
+                            enabled: _isEditable,
+                            minLines: 1,
+                            maxLines: 5,
+                          ),
+                        ],
 
-                        const Text('Sopa: '),
-                        TextFormField(
-                          controller: _soupController,
-                          //initialValue: '${meal.updatedSoup}',
-                          //controller: _controller,
-                          enabled: _isEditable,
-                          minLines: 1,
-                          maxLines: 5,
-                        ),
+                        if (meal.originalFish != meal.updatedFish || _isEditable)...[
+                          const Text('Prato Peixe: '),
+                          TextFormField(
+                            controller: _fishController,
+                            //initialValue: '${meal.updatedFish}',
+                            //controller: _controller,
+                            enabled: _isEditable,
+                            minLines: 1,
+                            maxLines: 5,
+                          ),
+                        ],
 
-                        const Text('Prato Peixe: '),
-                        TextFormField(
-                          controller: _fishController,
-                          //initialValue: '${meal.updatedFish}',
-                          //controller: _controller,
-                          enabled: _isEditable,
-                          minLines: 1,
-                          maxLines: 5,
-                        ),
+                        if (meal.originalMeat != meal.updatedMeat || _isEditable)...[
+                          const Text('Prato Carne: '),
+                          TextFormField(
+                            controller: _meatController,
+                            //initialValue: '${meal.updatedMeat}',
+                            //controller: _controller,
+                            enabled: _isEditable,
+                            minLines: 1,
+                            maxLines: 5,
+                          ),
+                        ],
 
-                        const Text('Prato Carne: '),
-                        TextFormField(
-                          controller: _meatController,
-                          //initialValue: '${meal.updatedMeat}',
-                          //controller: _controller,
-                          enabled: _isEditable,
-                          minLines: 1,
-                          maxLines: 5,
-                        ),
+                        if (meal.originalVegetarian != meal.updatedVegetarian || _isEditable)...[
+                          const Text('Prato Vegetariano: '),
+                          TextFormField(
+                            controller: _vegetarianController,
+                            //initialValue: '${meal.updatedVegetarian}',
+                            //controller: _controller,
+                            enabled: _isEditable,
+                            minLines: 1,
+                            maxLines: 5,
+                          ),
+                        ],
 
-                        const Text('Prato Vegetariano: '),
-                        TextFormField(
-                          controller: _vegetarianController,
-                          //initialValue: '${meal.updatedVegetarian}',
-                          //controller: _controller,
-                          enabled: _isEditable,
-                          minLines: 1,
-                          maxLines: 5,
-                        ),
-
-                        const Text('\nSobremesa: '),
-                        TextFormField(
-                          controller: _dessertController,
-                          //initialValue: '${meal.updatedDessert}',
-                          //controller: _controller,
-                          enabled: _isEditable,
-                          minLines: 1,
-                          maxLines: 5,
-                        ),
+                        if (meal.originalDessert != meal.updatedDessert || _isEditable)...[
+                          const Text('\nSobremesa: '),
+                          TextFormField(
+                            controller: _dessertController,
+                            //initialValue: '${meal.updatedDessert}',
+                            //controller: _controller,
+                            enabled: _isEditable,
+                            minLines: 1,
+                            maxLines: 5,
+                          ),
+                        ],
 
                       ],
                     ),
                   ),
                 ],
-
+                ],
               ],
             ),
           ),
