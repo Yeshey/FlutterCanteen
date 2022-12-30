@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -38,6 +39,22 @@ class MyApp extends StatelessWidget {
 
 class Meal {
 
+  Meal({
+    required this.thereIsAnUpdatedMeal,
+    required this.weekDay,
+    required this.originalSoup,
+    required this.originalFish,
+    required this.originalMeat,
+    required this.originalVegetarian,
+    required this.originalDessert,
+    required this.updatedSoup,
+    required this.updatedFish,
+    required this.updatedMeat,
+    required this.updatedVegetarian,
+    required this.updatedDessert,
+    required this.submitted
+  });
+
   Meal.fromJson(Map<String, dynamic> json, bool recUpdatedMeal)
       : weekDay = json['original']?['weekDay'] ?? '',
         originalSoup = json['original']?['soup'] ?? '',
@@ -53,7 +70,7 @@ class Meal {
         submitted = json['submitted'] ?? false,
         thereIsAnUpdatedMeal = recUpdatedMeal;
 
-  final bool thereIsAnUpdatedMeal;
+  bool thereIsAnUpdatedMeal;
   final String weekDay;
   final String originalSoup;
   final String originalFish;
@@ -95,7 +112,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       if (response.statusCode == HttpStatus.ok) {
         debugPrint(response.body);
 
-        prefs.setString('storedMeals', response.body);
+        saveMeals(response.bodyBytes);
 
         final meals = <Meal>[];
         bool updatedMeal = true;
@@ -132,13 +149,14 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
           _anyMealsToShow = true;
 
-          final String responseBody = prefs.getString('storedMeals');
+          //final String responseBody = prefs.getString('storedMeals');
+          final Uint8List responseBodyBytes = await getMeals();
 
-          debugPrint(responseBody);
+          //debugPrint(responseBody);
 
           final meals = <Meal>[];
           bool updatedMeal = true;
-          json.decode(responseBody).forEach((weekDay, data) { //utf8?
+          json.decode(utf8.decode(responseBodyBytes)).forEach((weekDay, data) { //utf8?
             if (data['update'] == null) {
               updatedMeal = false;
             }
@@ -157,9 +175,18 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       } finally {
         setState(() => _fetchingData = false);
       }
+  }
 
+  static Future<bool> saveMeals(Uint8List mealzz) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String base64Image = base64Encode(mealzz);
+    return prefs.setString("storedMeals", base64Image);
+  }
 
-
+  static Future<Uint8List> getMeals() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Uint8List bytes = base64Decode(prefs.getString("storedMeals"));
+    return bytes;
   }
 
   @override

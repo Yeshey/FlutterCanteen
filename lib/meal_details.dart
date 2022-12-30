@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'main.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_canteen/main.dart';
+import 'package:http/http.dart' as http;
+
 
 class MealDetails extends StatefulWidget {
   const MealDetails({Key? key}) : super(key : key);
@@ -13,18 +19,115 @@ class MealDetails extends StatefulWidget {
 
 class _MealDetailsState extends State<MealDetails> {
 
-  bool _isEnable = false; //_isEnable is the boolean variable and set it false, so we have to make it true when user tap on text
+  bool _isEditable = false; //_isEnable is the boolean variable and set it false, so we have to make it true when user tap on text
+  bool _isVisible = true;
+  bool _revertToOriginal = false;
 
+  final TextEditingController _soupController = TextEditingController();
+  final TextEditingController _fishController = TextEditingController();
+  final TextEditingController _meatController = TextEditingController();
+  final TextEditingController _vegetarianController = TextEditingController();
+  final TextEditingController _dessertController = TextEditingController();
+  bool _submitting = false;
+  bool _submitSuccess = false;
+  String _submitErrorMessage = '';
+/*
   late final Meal meal = ModalRoute.of(context)!.settings.arguments as Meal;
+  //late final Meal meal;
+
+  @override
+  void initState() {
+    super.initState();
+    //meal = ModalRoute.of(context)!.settings.arguments as Meal;
+    _soupController.text = meal.updatedSoup;
+    _fishController.text = meal.updatedFish;
+    _meatController.text = meal.updatedMeat;
+    _vegetarianController.text = meal.updatedVegetarian;
+    _dessertController.text = meal.updatedDessert;
+  }
+*/
+  /*_MealDetailsState() {
+    _soupController.text = meal.updatedSoup;
+    _fishController.text = meal.updatedFish;
+    _meatController.text = meal.updatedMeat;
+    _vegetarianController.text = meal.updatedVegetarian;
+    _dessertController.text = meal.updatedDessert;
+  }*/
+
+  late Meal meal;
+
+  Future<void> _submitChanges() async {
+    setState(() {
+      _submitting = true;
+      _submitSuccess = false;
+      _submitErrorMessage = '';
+    });
+    try {
+      final updatedMeal = Meal(
+        thereIsAnUpdatedMeal: true,
+        weekDay: meal.weekDay,
+        originalSoup: meal.originalSoup,
+        originalFish: meal.originalFish,
+        originalMeat: meal.originalMeat,
+        originalVegetarian: meal.originalVegetarian,
+        originalDessert: meal.originalDessert,
+        updatedSoup: _soupController.text,
+        updatedFish: _fishController.text,
+        updatedMeat: _meatController.text,
+        updatedVegetarian: _vegetarianController.text,
+        updatedDessert: _dessertController.text,
+        submitted: false,
+      );
+
+      final uri = Uri.parse('http://amov.servehttp.com:8080/menu/${meal.weekDay}/update');
+      final response = await http.post(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({
+          'soup': updatedMeal.updatedSoup,
+          'fish': updatedMeal.updatedFish,
+          'meat': updatedMeal.updatedMeat,
+          'vegetarian': updatedMeal.updatedVegetarian,
+          'dessert': updatedMeal.updatedDessert,
+        }),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        setState(() {
+          _submitting = false;
+          _submitSuccess = true;
+        });
+        Navigator.of(context).pop();
+      } else {
+        setState(() {
+          _submitting = false;
+          _submitErrorMessage = response.body;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _submitting = false;
+        _submitErrorMessage = e.toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    meal = ModalRoute.of(context)!.settings.arguments as Meal;
+    _soupController.text = meal.updatedSoup;
+    _fishController.text = meal.updatedFish;
+    _meatController.text = meal.updatedMeat;
+    _vegetarianController.text = meal.updatedVegetarian;
+    _dessertController.text = meal.updatedDessert;
     // final int? counter = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
         title: const Text(
-          'Second Screen',
+          'Meal Details',
           style: TextStyle(
             color: Colors.indigo,
           ),
@@ -68,6 +171,10 @@ class _MealDetailsState extends State<MealDetails> {
               ElevatedButton(
                 onPressed: () {
                   // TODO: Add code to handle "Repor" button press
+                  setState (() {
+                    _isVisible = false;
+                    _revertToOriginal = true;
+                  });
                 },
                 child: const Text('Repor'),
               ),
@@ -75,7 +182,8 @@ class _MealDetailsState extends State<MealDetails> {
                   icon: Icon(Icons.edit),
                   onPressed: () {
                     setState (() {
-                      _isEnable = true;
+                      _isEditable = true;
+                      _isVisible = true;
                     });
                   }),
             ],
@@ -88,7 +196,7 @@ class _MealDetailsState extends State<MealDetails> {
 
               children: [
 
-                if(meal.thereIsAnUpdatedMeal)...[
+                if(_isVisible && (meal.thereIsAnUpdatedMeal || _isEditable))...[
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,108 +224,127 @@ class _MealDetailsState extends State<MealDetails> {
 
                         const Text('Sopa: '),
                         TextFormField(
-                          initialValue: '${meal.updatedSoup}',
+                          controller: _soupController,
+                          //initialValue: '${meal.updatedSoup}',
                           //controller: _controller,
-                          enabled: _isEnable,
+                          enabled: _isEditable,
                           minLines: 1,
                           maxLines: 5,
                         ),
 
                         const Text('Prato Peixe: '),
                         TextFormField(
-                          initialValue: '${meal.updatedFish}',
+                          controller: _fishController,
+                          //initialValue: '${meal.updatedFish}',
                           //controller: _controller,
-                          enabled: _isEnable,
+                          enabled: _isEditable,
                           minLines: 1,
                           maxLines: 5,
                         ),
 
                         const Text('Prato Carne: '),
                         TextFormField(
-                          initialValue: '${meal.updatedMeat}',
+                          controller: _meatController,
+                          //initialValue: '${meal.updatedMeat}',
                           //controller: _controller,
-                          enabled: _isEnable,
+                          enabled: _isEditable,
                           minLines: 1,
                           maxLines: 5,
                         ),
 
                         const Text('Prato Vegetariano: '),
                         TextFormField(
-                          initialValue: '${meal.updatedVegetarian}',
+                          controller: _vegetarianController,
+                          //initialValue: '${meal.updatedVegetarian}',
                           //controller: _controller,
-                          enabled: _isEnable,
+                          enabled: _isEditable,
                           minLines: 1,
                           maxLines: 5,
                         ),
 
                         const Text('\nSobremesa: '),
                         TextFormField(
-                          initialValue: '${meal.updatedDessert}',
+                          controller: _dessertController,
+                          //initialValue: '${meal.updatedDessert}',
                           //controller: _controller,
-                          enabled: _isEnable,
+                          enabled: _isEditable,
                           minLines: 1,
                           maxLines: 5,
                         ),
-
 
                       ],
                     ),
                   ),
                 ],
 
-
-
-
-
               ],
             ),
           ),
 
           Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              padding: const EdgeInsets.all(8.0),
+
+              child: Row(
+                  children:[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
 
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: <Widget> [
-                          Expanded(
-                            child: Text(
-                              'Ementa Original',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: <Widget> [
+                                  Expanded(
+                                    child: Text(
+                                      'Ementa Original',
+                                      style: TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
+
+
+                          Text('Sopa: ${meal.originalSoup}\n'),
+                          Text('Prato Peixe: ${meal.originalFish}\n'),
+                          Text('Prato Carne: ${meal.originalMeat}\n'),
+                          Text('Prato Vegetariano: ${meal.originalVegetarian}\n'),
+                          Text('Sobremesa: ${meal.originalDessert}\n'),
                         ],
-                      )
-                    ],
-                  ),
+                      ),
+                    ),
 
-
-                  Text('Sopa: ${meal.originalSoup}\n'),
-                  Text('Prato Peixe: ${meal.originalFish}\n'),
-                  Text('Prato Carne: ${meal.originalMeat}\n'),
-                  Text('Prato Vegetariano: ${meal.originalVegetarian}\n'),
-                  Text('Sobremesa: ${meal.originalDessert}\n'),
-                ],
-              ),
-            ),
+                  ]
+              )
           ),
 
           SizedBox(height: 8.0),
+          const SizedBox(height: 16.0),
+          if (_submitting)
+            const CircularProgressIndicator()
+          else if (_submitSuccess)
+            Text('Changes submitted successfully')
+          else if (_submitErrorMessage.isNotEmpty)
+              Text(_submitErrorMessage),
+          const SizedBox(height: 16.0),
           ElevatedButton(
-            onPressed: () {
+              onPressed: _submitting ? null : _submitChanges,
+              child: const Text('Submit Changes'),
+            ),
+            /*{
               // TODO: Add code to handle "Submeter" button press
+              // meal.thereIsAnUpdatedMeal = true;
+              // if (_revertToOriginal{ }
             },
             child: const Text('Submeter'),
-          ),
+          ),*/
         ],
         )
       ),
