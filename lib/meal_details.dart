@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 import 'main.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as image;
 
 
 class MealDetails extends StatefulWidget {
@@ -76,6 +79,18 @@ class _MealDetailsState extends State<MealDetails> {
         );
       }
 
+      // Read the image file from the local file system
+      final imageBytes = await rootBundle.load('images/cafeteria_meal.jpg');
+// Decode the image as an Image object
+      final img = image.decodeImage(imageBytes.buffer.asUint8List());
+// Encode the image as a Base64 string
+      final imgBase64 = base64Encode(image.encodeJpg(img));
+
+      // Load the image file from the local file system
+      //image.Image img = image.decodeImage(Image.asset('images/cafeteria_meal.jpg'));
+      // Encode the image as a Base64 string
+      //String imgBase64 = base64Encode(image.encodeJpg(img));
+
       final uri = Uri.parse('http://amov.servehttp.com:8080/menu');
       final response = await http.post(
         uri,
@@ -84,7 +99,7 @@ class _MealDetailsState extends State<MealDetails> {
         },
         body: jsonEncode(
             {
-              "img": null,
+              "img": imgBase64,
               "weekDay": updatedMeal.weekDay,
               "soup": updatedMeal.updatedSoup,
               "fish": updatedMeal.updatedFish,
