@@ -10,7 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as image;
-
+import 'package:camera/camera.dart';
 
 class MealDetails extends StatefulWidget {
   const MealDetails({Key? key}) : super(key : key);
@@ -37,6 +37,37 @@ class _MealDetailsState extends State<MealDetails> {
   String _submitErrorMessage = '';
 
   late Meal meal;
+
+
+
+  List<CameraDescription>? cameras; //list out the camera available
+  CameraController? controller; //controller for camera
+  XFile? imageCamera; //for captured image
+  bool firstTime = true;
+
+  @override
+  void initState() {
+    //loadCamera();
+    super.initState();
+  }
+
+  loadCamera() async {
+    cameras = await availableCameras();
+    if(cameras != null){
+      controller = CameraController(cameras![0], ResolutionPreset.max);
+      //cameras[0] = first camera, change to 1 to another camera
+
+      controller!.initialize().then((_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {});
+      });
+    }else{
+      debugPrint("No camera found");
+    }
+  }
+
 
   Future<void> _submitChanges() async {
     setState(() {
@@ -139,6 +170,9 @@ class _MealDetailsState extends State<MealDetails> {
 
   @override
   Widget build(BuildContext context) {
+
+    final path = 'path/to/save/image.jpg';
+
     meal = ModalRoute.of(context)!.settings.arguments as Meal;
     _soupController.text = meal.updatedSoup;
     _fishController.text = meal.updatedFish;
@@ -167,12 +201,31 @@ class _MealDetailsState extends State<MealDetails> {
               child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
                     IconButton(
                       icon: const Icon(Icons.camera_alt),
-                      onPressed: () {
-                        // TODO: Add code to handle camera button press
+                      onPressed: () async{
+                        try {
+                          if (firstTime){
+                            await loadCamera();
+                            firstTime = false;
+                          }
+                          if(controller != null){ //check if controller is not null
+                            if(controller!.value.isInitialized){ //check if controller is initialized
+                              imageCamera = await controller!.takePicture(); //capture image
+                              setState(() {
+                                //update UI
+                              });
+                            }
+                          }
+                        } catch (e) {
+                          print(e); //show error
+                        }
                       },
                     ),
+
+                    //CameraPreview(cameraController),
+                    //Image.file(File(path)),
                     Hero(
                       tag: 'AmovTag1',
                       child: Text('Change Meal Image'),
@@ -181,17 +234,26 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ),
 
-              if (meal.img.isEmpty)...[
-                SizedBox(
-                  height: 200,
-                  child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
-                ),
+              if (imageCamera == null)...[
+                if (meal.img.isEmpty)...[
+                  SizedBox(
+                    height: 200,
+                    child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
+                  ),
+                ]else...[
+                  SizedBox(
+                    height: 200,
+                    child: Image.network('${constants.SERVER_URL}/images/${meal.img}'),
+                  ),
+                ],
               ]else...[
-                SizedBox(
-                  height: 200,
-                  child: Image.network('${constants.SERVER_URL}/images/${meal.img}'),
+                Container( //show captured image
+                  padding: EdgeInsets.all(30),
+                  child: Image.file(File(imageCamera!.path), height: 300,),
+                  //display captured image
                 ),
-              ]
+              ],
+
             ],
           ),
 
