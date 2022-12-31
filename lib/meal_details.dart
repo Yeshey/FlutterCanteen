@@ -204,6 +204,7 @@ class _MealDetailsState extends State<MealDetails> {
                       icon: const Icon(Icons.camera_alt),
                       onPressed: () async{
                         try {
+                          _revertToOriginal = false;
                           if (firstTime){
                             await loadCamera();
                             firstTime = false;
@@ -232,8 +233,8 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ),
 
-              if (imageCamera == null)...[
-                if (meal.img.isEmpty)...[
+              if (imageCamera == null || _revertToOriginal==true)...[
+                if (meal.img.isEmpty || _revertToOriginal==true)...[
                   SizedBox(
                     height: 200,
                     child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
