@@ -113,17 +113,15 @@ class _MealDetailsState extends State<MealDetails> {
         );
       }
 
-      // Read the image file from the local file system
-      final imageBytes = await rootBundle.load('images/cafeteria_meal.jpg');
-// Decode the image as an Image object
-      final img = image.decodeImage(imageBytes.buffer.asUint8List());
-// Encode the image as a Base64 string
-      final imgBase64 = base64Encode(image.encodeJpg(img));
 
-      // Load the image file from the local file system
-      //image.Image img = image.decodeImage(Image.asset('images/cafeteria_meal.jpg'));
-      // Encode the image as a Base64 string
-      //String imgBase64 = base64Encode(image.encodeJpg(img));
+      var imgBase64new = null;
+
+      if (imageCamera != null) {
+        // Read the content of the XFile object into a Uint8List
+        Uint8List imageBytes = await imageCamera?.readAsBytes() as Uint8List;
+        // Encode the Uint8List into a base64 String
+        imgBase64new = imageBytes != null ? base64Encode(imageBytes) : null;
+      }
 
       final uri = Uri.parse('${constants.SERVER_URL}/menu');
       final response = await http.post(
@@ -134,7 +132,7 @@ class _MealDetailsState extends State<MealDetails> {
         body: jsonEncode(
             {
               //"img": imgBase64,
-              "img": null,
+              "img": imgBase64new,
               "weekDay": updatedMeal.weekDay,
               "soup": updatedMeal.updatedSoup,
               "fish": updatedMeal.updatedFish,
