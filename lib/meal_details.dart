@@ -261,7 +261,6 @@ class _MealDetailsState extends State<MealDetails> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  // TODO: Add code to handle "Repor" button press
                   setState (() {
                     _isVisible = false;
                     _revertToOriginal = true;
