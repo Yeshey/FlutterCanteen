@@ -21,7 +21,6 @@ version: 1.0.0+1
 
 environment:
   sdk: '>=2.18.4 <3.0.0'
-  # sdk: '>=2.21.0 <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -40,7 +39,7 @@ dependencies:
   http: any
   shared_preferences: ^0.5.9
   image: ^2.0.0
-  # camera: ^0.7.0+4
+  camera: ^0.7.0+4
 
 dev_dependencies:
   flutter_test:
