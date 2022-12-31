@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
+import 'constants.dart' as constants;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -52,7 +52,8 @@ class Meal {
     required this.updatedMeat,
     required this.updatedVegetarian,
     required this.updatedDessert,
-    required this.submitted
+    required this.submitted,
+    required this.img
   });
 
   Meal.fromJson(Map<String, dynamic> json, bool recUpdatedMeal)
@@ -67,10 +68,12 @@ class Meal {
         updatedMeat = json['update']?['meat'] ?? '',
         updatedVegetarian = json['update']?['vegetarian'] ?? '',
         updatedDessert = json['update']?['desert'] ?? '',
+        img = json['update']?['img'] ?? '',
         submitted = json['submitted'] ?? false,
         thereIsAnUpdatedMeal = recUpdatedMeal;
 
   bool thereIsAnUpdatedMeal;
+  final String img;
   final String weekDay;
   final String originalSoup;
   final String originalFish;
@@ -96,7 +99,7 @@ class MealChooserScreen extends StatefulWidget {
 
 class _MealChooserScreenState extends State<MealChooserScreen> {
 
-  static const String _catFactsUrl = 'http://amov.servehttp.com:8080/menu'; // 'http://amov.servehttp.com:8080/menu'; //'http://0.0.0.0:8080/menu'; // 'https://catfact.ninja/facts';
+  static const String _catFactsUrl = '${constants.SERVER_URL}/menu'; // 'http://amov.servehttp.com:8080/menu'; //'http://0.0.0.0:8080/menu'; // 'https://catfact.ninja/facts';
 
   List<Meal>? _meals = [];
   bool _anyMealsToShow = true;

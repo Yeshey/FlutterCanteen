@@ -1,0 +1,1 @@
+const String SERVER_URL = 'http://amov.servehttp.com:8080';

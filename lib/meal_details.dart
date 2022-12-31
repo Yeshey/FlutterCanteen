@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
+import 'constants.dart' as constants;
 import 'main.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -59,6 +60,7 @@ class _MealDetailsState extends State<MealDetails> {
           updatedMeat: _meatController.text,
           updatedVegetarian: _vegetarianController.text,
           updatedDessert: _dessertController.text,
+          img: meal.img,
           submitted: false,
         );
       } else {
@@ -75,6 +77,7 @@ class _MealDetailsState extends State<MealDetails> {
           updatedMeat: "",
           updatedVegetarian: "",
           updatedDessert: "",
+          img: "",
           submitted: false,
         );
       }
@@ -91,7 +94,7 @@ class _MealDetailsState extends State<MealDetails> {
       // Encode the image as a Base64 string
       //String imgBase64 = base64Encode(image.encodeJpg(img));
 
-      final uri = Uri.parse('http://amov.servehttp.com:8080/menu');
+      final uri = Uri.parse('${constants.SERVER_URL}/menu');
       final response = await http.post(
         uri,
         headers: <String, String>{
@@ -99,7 +102,8 @@ class _MealDetailsState extends State<MealDetails> {
         },
         body: jsonEncode(
             {
-              "img": imgBase64,
+              //"img": imgBase64,
+              "img": null,
               "weekDay": updatedMeal.weekDay,
               "soup": updatedMeal.updatedSoup,
               "fish": updatedMeal.updatedFish,
@@ -177,10 +181,17 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ),
 
-              SizedBox(
-                height: 200,
-                child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
-              ),
+              if (meal.img.isEmpty)...[
+                SizedBox(
+                  height: 200,
+                  child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
+                ),
+              ]else...[
+                SizedBox(
+                  height: 200,
+                  child: Image.network('${constants.SERVER_URL}/images/${meal.img}'),
+                ),
+              ]
             ],
           ),
 
