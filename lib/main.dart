@@ -250,17 +250,20 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                   ]
                                 ]),
 
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final result = await Navigator.pushNamed(
-                                    context,
-                                    MealDetails.routname,
-                                    arguments: meal,
-                                  );
-                                  // Do something with the result
-                                },
-                                child: Text('Meal Details'),
-                              ),
+                              Hero(
+                                tag: 'mealdetails${meal.weekDay}',
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    final result = await Navigator.pushNamed(
+                                      context,
+                                      MealDetails.routname,
+                                      arguments: meal,
+                                    );
+                                    // Do something with the result
+                                  },
+                                  child: const Text('Meal Details'),
+                                ),
+                              )
 
                             ],
                           ),

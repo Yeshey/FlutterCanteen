@@ -47,7 +47,7 @@ class _MealDetailsState extends State<MealDetails> {
 
   @override
   void initState() {
-    //loadCamera();
+    loadCamera();
     super.initState();
   }
 
@@ -205,10 +205,10 @@ class _MealDetailsState extends State<MealDetails> {
                       onPressed: () async{
                         try {
                           _revertToOriginal = false;
-                          if (firstTime){
-                            await loadCamera();
-                            firstTime = false;
-                          }
+                          //if (firstTime){
+                          //  await loadCamera();
+                          //  firstTime = false;
+                          //}
                           if(controller != null){ //check if controller is not null
                             if(controller!.value.isInitialized){ //check if controller is initialized
                               imageCamera = await controller!.takePicture(); //capture image
