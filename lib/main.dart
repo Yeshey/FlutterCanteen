@@ -128,7 +128,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
           final meal = Meal.fromJson(data,updatedMeal);
           meals.add(meal);
         });
-        setState(() => _meals = meals);
+        setState(() => _meals = orderMeals(meals));
 
       }
     } catch (e) {
@@ -137,6 +137,49 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       setState(() => _fetchingData = false);
     }
   }
+
+  List<Meal> orderMeals(List<Meal> meals) {
+
+    meals.sort((a, b) => _customWeekdayCompare(a.weekDay, b.weekDay));
+    return meals;
+  }
+
+  int _customWeekdayCompare(String weekday1, String weekday2) {
+
+    final currentWeekday = getCurrentWeekday();
+    final weekdays = ['WEDNESDAY', 'THURSDAY', 'FRIDAY', 'MONDAY', 'TUESDAY'];
+    final currentWeekdayIndex = weekdays.indexOf(currentWeekday);
+    final sortedWeekdays = weekdays.sublist(currentWeekdayIndex)
+        + weekdays.sublist(0, currentWeekdayIndex);
+
+    final index1 = sortedWeekdays.indexOf(weekday1);
+    final index2 = sortedWeekdays.indexOf(weekday2);
+    return index1.compareTo(index2);
+  }
+
+  String getCurrentWeekday() {
+    final now = DateTime.now();
+    final weekday = now.weekday;
+    switch (weekday) {
+      case 1:
+        return 'MONDAY';
+      case 2:
+        return 'TUESDAY';
+      case 3:
+        return 'WEDNESDAY';
+      case 4:
+        return 'THURSDAY';
+      case 5:
+        return 'FRIDAY';
+      case 6:
+        return 'MONDAY';
+      case 7:
+        return 'MONDAY';
+      default:
+        return 'Unknown';
+    }
+  }
+
 
   Future<void> _fetchLocalMeals() async {
 
@@ -166,7 +209,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
             final meal = Meal.fromJson(data,updatedMeal);
             meals.add(meal);
           });
-          setState(() => _meals = meals);
+          setState(() => _meals = orderMeals(meals));
 
         } else {
           // Show, No meals screen
