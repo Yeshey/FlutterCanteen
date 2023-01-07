@@ -142,20 +142,18 @@ class _MealDetailsState extends State<MealDetails> {
             }),
       );
 
-
-
-      if (response.statusCode == HttpStatus.ok) {
+      if (response.statusCode == 201) { // seems like it works when its 201 and not HttpStatus.ok
         setState(() {
           _submitting = false;
           _submitSuccess = true;
-          _submitErrorMessage = utf8.decode(response.bodyBytes);
+          _submitErrorMessage = ''; // utf8.decode(response.bodyBytes);
         });
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(_submitSuccess);
 
       } else {
         setState(() {
           _submitting = false;
-          _submitErrorMessage = utf8.decode(response.bodyBytes);
+          _submitErrorMessage = utf8.decode(response.bodyBytes) + ' response.statusCode: ' + response.statusCode.toString();
         });
       }
     } catch (e) {
