@@ -167,15 +167,12 @@ class _MealDetailsState extends State<MealDetails> {
   @override
   Widget build(BuildContext context) {
 
-    final path = 'path/to/save/image.jpg';
-
     meal = ModalRoute.of(context)!.settings.arguments as Meal;
     _soupController.text = meal.updatedSoup;
     _fishController.text = meal.updatedFish;
     _meatController.text = meal.updatedMeat;
     _vegetarianController.text = meal.updatedVegetarian;
     _dessertController.text = meal.updatedDessert;
-    // final int? counter = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
@@ -221,12 +218,7 @@ class _MealDetailsState extends State<MealDetails> {
                       },
                     ),
 
-                    //CameraPreview(cameraController),
-                    //Image.file(File(path)),
-                    Hero(
-                      tag: 'AmovTag1',
-                      child: Text('Change Meal Image'),
-                    ),
+                     Text('Change Meal Image'),
                   ],
                 ),
               ),
@@ -440,10 +432,13 @@ class _MealDetailsState extends State<MealDetails> {
           else if (_submitErrorMessage.isNotEmpty)
               Text(_submitErrorMessage),
           const SizedBox(height: 16.0),
-          ElevatedButton(
-              onPressed: _submitting ? null : _submitChanges,
-              child: const Text('Submit Changes'),
-            ),
+          Hero(
+            tag: 'backToMain',
+            child: ElevatedButton(
+                onPressed: _submitting ? null : _submitChanges,
+                child: const Text('Submit Changes'),
+              ),
+          )
             /*{
               // TODO: Add code to handle "Submeter" button press
               // meal.thereIsAnUpdatedMeal = true;

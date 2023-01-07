@@ -316,7 +316,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                 ]),
 
                               Hero(
-                                tag: 'mealdetails${meal.weekDay}',
+                                tag: 'mealdetails${meal.weekDay}${index}',
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     final result = await Navigator.pushNamed(
