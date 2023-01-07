@@ -324,6 +324,10 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                       MealDetails.routname,
                                       arguments: meal,
                                     );
+
+                                    if (result != null && result == true){
+                                      _fetchMeals();
+                                    }
                                     // Do something with the result
                                   },
                                   child: const Text('Meal Details'),
