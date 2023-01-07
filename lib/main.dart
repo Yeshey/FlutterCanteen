@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
 
 import 'meal_details.dart';
 
@@ -128,7 +129,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
           final meal = Meal.fromJson(data,updatedMeal);
           meals.add(meal);
         });
-        setState(() => _meals = meals);
+        setState(() => _meals = orderMeals(meals));
 
       }
     } catch (e) {
@@ -136,6 +137,52 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
     } finally {
       setState(() => _fetchingData = false);
     }
+  }
+
+  List<Meal> orderMeals(List<Meal> meals) {
+
+    meals.sort((a, b) => _customWeekdayCompare(a.weekDay, b.weekDay));
+    return meals;
+  }
+
+  int _customWeekdayCompare(String weekday1, String weekday2) {
+
+    final currentWeekday = getCurrentWeekday();
+    final weekdays = ['WEDNESDAY', 'THURSDAY', 'FRIDAY', 'MONDAY', 'TUESDAY'];
+    final currentWeekdayIndex = weekdays.indexOf(currentWeekday);
+    final sortedWeekdays = weekdays.sublist(currentWeekdayIndex)
+        + weekdays.sublist(0, currentWeekdayIndex);
+
+    final index1 = sortedWeekdays.indexOf(weekday1);
+    final index2 = sortedWeekdays.indexOf(weekday2);
+    return index1.compareTo(index2);
+  }
+
+  String getCurrentWeekday() {
+    final now = DateTime.now();
+    final weekday = now.weekday;
+    switch (weekday) {
+      case 1:
+        return 'MONDAY';
+      case 2:
+        return 'TUESDAY';
+      case 3:
+        return 'WEDNESDAY';
+      case 4:
+        return 'THURSDAY';
+      case 5:
+        return 'FRIDAY';
+      case 6:
+        return 'MONDAY';
+      case 7:
+        return 'MONDAY';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  int getMaxIntValue() {
+    return (pow(2, 31) - 1).toInt();
   }
 
   Future<void> _fetchLocalMeals() async {
@@ -166,7 +213,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
             final meal = Meal.fromJson(data,updatedMeal);
             meals.add(meal);
           });
-          setState(() => _meals = meals);
+          setState(() => _meals = orderMeals(meals));
 
         } else {
           // Show, No meals screen
@@ -216,17 +263,35 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
             children: [
               const SizedBox(height: 20.0),
 
-
               if (_fetchingData) const CircularProgressIndicator(),
 
               if (_anyMealsToShow && !_fetchingData && _meals != null && _meals!.isNotEmpty)...[
                 Flexible(
                   child: ListView.builder(
-
-                    itemCount: _meals!.length,
+                    itemCount: getMaxIntValue(),
+                    //itemCount: _meals!.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Meal meal = _meals![index];
-                      return Card(
+                      //final Meal meal = _meals![index];
+                      final Meal meal = _meals![index % _meals!.length];
+                      final children = <Widget>[];
+
+                      if (index % 7 == 0) {
+                        children.add(
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Weekday: ${(index ~/ 7) + 1 }',
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      children.add(
+                      Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -268,7 +333,9 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                             ],
                           ),
                         ),
+                      ),
                       );
+                      return Column(children: children);
                     },
                   ),
                 ),
