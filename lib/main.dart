@@ -101,7 +101,7 @@ class MealChooserScreen extends StatefulWidget {
 
 class _MealChooserScreenState extends State<MealChooserScreen> {
 
-  static const String _catFactsUrl = '${constants.SERVER_URL}/menu'; // 'http://amov.servehttp.com:8080/menu'; //'http://0.0.0.0:8080/menu'; // 'https://catfact.ninja/facts';
+  static const String _serverMenuUrl = '${constants.SERVER_URL}/menu'; // 'http://amov.servehttp.com:8080/menu'; //'http://0.0.0.0:8080/menu'; // 'https://catfact.ninja/facts';
 
   List<Meal>? _meals = [];
   bool _anyMealsToShow = true;
@@ -111,7 +111,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
       setState(() => _fetchingData = true);
       setState(() => _anyMealsToShow = true);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      http.Response response = await http.get(Uri.parse(_catFactsUrl));
+      http.Response response = await http.get(Uri.parse(_serverMenuUrl));
 
       if (response.statusCode == HttpStatus.ok) {
         debugPrint(response.body);
