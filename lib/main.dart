@@ -269,12 +269,12 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                       final Meal meal = _meals![index % _meals!.length];
                       final children = <Widget>[];
 
-                      if (index % 7 == 0) {
+                      if (index % 5 == 0) {
                         children.add(
                           Container(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              'Weekday: ${(index ~/ 7) + 1 }',
+                              'Weekday: ${(index ~/ 5) + 1 }',
                               style: TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.bold,
