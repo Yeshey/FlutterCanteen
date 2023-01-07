@@ -282,32 +282,22 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ),
 
-              if (_imageCamera == null || _revertToOriginal==true)...[
-                if (_meal.updatedImg.isEmpty || _revertToOriginal==true)...[
-
-                  if (_meal.originalImg == null || _meal.originalImg.isEmpty)...[
-                    SizedBox(
-                      height: 200,
-                      child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
-                    ),
-                  ]else...[
-                    SizedBox(
-                      height: 200,
-                      child: Image.network('${constants.SERVER_URL}/images/${_meal.originalImg}'),
-                    ),
-                  ]
-                ]else...[
-                  SizedBox(
-                    height: 200,
-                    child: Image.network('${constants.SERVER_URL}/images/${_meal.updatedImg}'),
-                  ),
-                ],
-              ]else...[
-                Container( //show captured image
+              Expanded(
+                flex: 2,
+                child: _imageCamera == null || _revertToOriginal == true // if there is no image from camera to display (or we want to revert changes)
+                    ? ( _meal.updatedImg.isEmpty || _revertToOriginal == true // if there is no UpdatedImg in current meal (or we want to revert changes)
+                        ? ( _meal.originalImg == null || _meal.originalImg.isEmpty // if original image in server doesn't exist
+                            ? Image.asset('images/DefaultMeal-evie-s-unsplash.jpg')
+                            : Image.network('${constants.SERVER_URL}/images/${_meal.originalImg}')
+                          )
+                        : Image.network('${constants.SERVER_URL}/images/${_meal.updatedImg}')
+                      ) : Container (
+                  // show captured image
                   padding: EdgeInsets.all(30),
-                  child: Image.file(File(_imageCamera!.path), height: 300,), //display captured image
+                  child: Image.file(File(_imageCamera!.path), height: 300),
                 ),
-              ],
+              ),
+
 
             ],
           ),
