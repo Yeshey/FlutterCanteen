@@ -17,7 +17,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // Root Widget of application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,15 +25,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const MyHomePage(title: 'Flutter Demo Home Page'),
       initialRoute: MealChooserScreen.routename,
       routes: {
-        // '/': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
 
         MealChooserScreen.routename : (context) => MealChooserScreen(),
         MealDetails.routname : (context) => MealDetails(),
       },
-      debugShowCheckedModeBanner: false, // no longuer debugging flag in the app!!
+      debugShowCheckedModeBanner: false, // no longer debugging flag in the app!!
     );
   }
 }
@@ -188,7 +186,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
   Future<void> _fetchLocalMeals() async {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    //final success = await prefs.remove('storedMeals');
 
     try {
 
@@ -199,10 +196,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
           _anyMealsToShow = true;
 
-          //final String responseBody = prefs.getString('storedMeals');
           final Uint8List responseBodyBytes = await getMeals();
-
-          //debugPrint(responseBody);
 
           final meals = <Meal>[];
           bool updatedMeal = true;
@@ -316,7 +310,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                 ]),
 
                               Hero(
-                                tag: 'mealdetails${meal.weekDay}${index}',
+                                tag: 'mealdetails${meal.weekDay}$index',
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     final result = await Navigator.pushNamed(
@@ -328,7 +322,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                                     if (result != null && result == true){
                                       _fetchMeals();
                                     }
-                                    // Do something with the result
                                   },
                                   child: const Text('Meal Details'),
                                 ),

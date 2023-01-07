@@ -9,7 +9,6 @@ import 'main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as image;
 import 'package:camera/camera.dart';
 
 class MealDetails extends StatefulWidget {
@@ -23,7 +22,7 @@ class MealDetails extends StatefulWidget {
 
 class _MealDetailsState extends State<MealDetails> {
 
-  bool _isEditable = false; //_isEnable is the boolean variable and set it false, so we have to make it true when user tap on text
+  bool _isEditable = false;
   bool _isVisible = true;
   bool _revertToOriginal = false;
 
@@ -40,9 +39,9 @@ class _MealDetailsState extends State<MealDetails> {
 
 
 
-  List<CameraDescription>? cameras; //list out the camera available
-  CameraController? controller; //controller for camera
-  XFile? imageCamera; //for captured image
+  List<CameraDescription>? cameras; // list out the camera available
+  CameraController? controller; // controller for camera
+  XFile? imageCamera; // for captured image
   bool firstTime = true;
 
   @override
@@ -54,8 +53,7 @@ class _MealDetailsState extends State<MealDetails> {
   loadCamera() async {
     cameras = await availableCameras();
     if(cameras != null){
-      controller = CameraController(cameras![0], ResolutionPreset.max);
-      //cameras[0] = first camera, change to 1 to another camera
+      controller = CameraController(cameras![0], ResolutionPreset.max); //cameras[0] = first camera, change to 1 to another camera
 
       controller!.initialize().then((_) {
         if (!mounted) {
@@ -131,7 +129,6 @@ class _MealDetailsState extends State<MealDetails> {
         },
         body: jsonEncode(
             {
-              //"img": imgBase64,
               "img": imgBase64new,
               "weekDay": updatedMeal.weekDay,
               "soup": updatedMeal.updatedSoup,
@@ -146,7 +143,7 @@ class _MealDetailsState extends State<MealDetails> {
         setState(() {
           _submitting = false;
           _submitSuccess = true;
-          _submitErrorMessage = ''; // utf8.decode(response.bodyBytes);
+          _submitErrorMessage = '';
         });
         Navigator.of(context).pop(_submitSuccess);
 
@@ -184,7 +181,6 @@ class _MealDetailsState extends State<MealDetails> {
         ),
       ),
       body: SingleChildScrollView(
-        //child: Stack(
         child: Column(
         children: [
           Row(
@@ -200,10 +196,6 @@ class _MealDetailsState extends State<MealDetails> {
                       onPressed: () async{
                         try {
                           _revertToOriginal = false;
-                          //if (firstTime){
-                          //  await loadCamera();
-                          //  firstTime = false;
-                          //}
                           if(controller != null){ //check if controller is not null
                             if(controller!.value.isInitialized){ //check if controller is initialized
                               imageCamera = await controller!.takePicture(); //capture image
@@ -238,8 +230,7 @@ class _MealDetailsState extends State<MealDetails> {
               ]else...[
                 Container( //show captured image
                   padding: EdgeInsets.all(30),
-                  child: Image.file(File(imageCamera!.path), height: 300,),
-                  //display captured image
+                  child: Image.file(File(imageCamera!.path), height: 300,), //display captured image
                 ),
               ],
 
@@ -295,7 +286,7 @@ class _MealDetailsState extends State<MealDetails> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              children: const <Widget> [ //mudei aqui
+                              children: const <Widget> [
                                 Expanded(
                                   child:Text(
                                     'Ementa Atualizada',
@@ -314,8 +305,6 @@ class _MealDetailsState extends State<MealDetails> {
                           const Text('Sopa: '),
                           TextFormField(
                             controller: _soupController,
-                            //initialValue: '${meal.updatedSoup}',
-                            //controller: _controller,
                             enabled: _isEditable,
                             minLines: 1,
                             maxLines: 5,
@@ -326,8 +315,6 @@ class _MealDetailsState extends State<MealDetails> {
                           const Text('Prato Peixe: '),
                           TextFormField(
                             controller: _fishController,
-                            //initialValue: '${meal.updatedFish}',
-                            //controller: _controller,
                             enabled: _isEditable,
                             minLines: 1,
                             maxLines: 5,
@@ -338,8 +325,6 @@ class _MealDetailsState extends State<MealDetails> {
                           const Text('Prato Carne: '),
                           TextFormField(
                             controller: _meatController,
-                            //initialValue: '${meal.updatedMeat}',
-                            //controller: _controller,
                             enabled: _isEditable,
                             minLines: 1,
                             maxLines: 5,
@@ -350,8 +335,6 @@ class _MealDetailsState extends State<MealDetails> {
                           const Text('Prato Vegetariano: '),
                           TextFormField(
                             controller: _vegetarianController,
-                            //initialValue: '${meal.updatedVegetarian}',
-                            //controller: _controller,
                             enabled: _isEditable,
                             minLines: 1,
                             maxLines: 5,
@@ -362,8 +345,6 @@ class _MealDetailsState extends State<MealDetails> {
                           const Text('\nSobremesa: '),
                           TextFormField(
                             controller: _dessertController,
-                            //initialValue: '${meal.updatedDessert}',
-                            //controller: _controller,
                             enabled: _isEditable,
                             minLines: 1,
                             maxLines: 5,
@@ -439,13 +420,6 @@ class _MealDetailsState extends State<MealDetails> {
                 child: const Text('Submit Changes'),
               ),
           )
-            /*{
-              // TODO: Add code to handle "Submeter" button press
-              // meal.thereIsAnUpdatedMeal = true;
-              // if (_revertToOriginal{ }
-            },
-            child: const Text('Submeter'),
-          ),*/
         ],
         )
       ),
