@@ -303,9 +303,9 @@ class _MealDetailsState extends State<MealDetails> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              children: <Widget> [
+                              children: const <Widget> [ //mudei aqui
                                 Expanded(
-                                  child: Text(
+                                  child:Text(
                                     'Ementa Atualizada',
                                     style: TextStyle(
                                       fontSize: 16.0,

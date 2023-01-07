@@ -346,7 +346,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
               ]else...[
                 if (!_fetchingData)
-                  Text(
+                  const Text( //mudei aqui
                     "No meals to show",
                     textScaleFactor: 2,
                   ),
