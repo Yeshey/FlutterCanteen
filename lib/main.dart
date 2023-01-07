@@ -229,7 +229,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
   static Future<Uint8List> getMeals() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    Uint8List bytes = base64Decode(prefs.getString("storedMeals"));
+    Uint8List bytes = base64Decode(prefs.getString("storedMeals") ?? '');
     return bytes;
   }
 
