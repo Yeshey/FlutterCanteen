@@ -68,7 +68,7 @@ class Meal {
         updatedMeat = json['update']?['meat'] ?? '',
         updatedVegetarian = json['update']?['vegetarian'] ?? '',
         updatedDessert = json['update']?['desert'] ?? '',
-        originalImg = json['update']?['img'] ?? '',
+        originalImg = json['original']?['img'] ?? '',
         updatedImg = json['update']?['img'] ?? '',
         submitted = json['submitted'] ?? false,
         thereIsAnUpdatedMeal = recUpdatedMeal;
@@ -106,7 +106,6 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
   List<Meal>? _meals = [];
   bool _anyMealsToShow = true;
   bool _fetchingData = true;
-  // final meals = <Meal>[];
   Future<void> _fetchMeals() async {
     try {
       setState(() => _fetchingData = true);
@@ -196,10 +195,11 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
 
         if (prefs.containsKey('storedMeals') == true){
             // Extract the local data
-
           _anyMealsToShow = true;
 
           final Uint8List responseBodyBytes = await getMeals();
+
+          debugPrint(utf8.decode(responseBodyBytes));
 
           final meals = <Meal>[];
           bool updatedMeal = true;
@@ -266,9 +266,7 @@ class _MealChooserScreenState extends State<MealChooserScreen> {
                 Flexible(
                   child: ListView.builder(
                     itemCount: getMaxIntValue(),
-                    //itemCount: _meals!.length,
                     itemBuilder: (BuildContext context, int index) {
-                      //final Meal meal = _meals![index];
                       final Meal meal = _meals![index % _meals!.length];
                       final children = <Widget>[];
 

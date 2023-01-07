@@ -285,7 +285,7 @@ class _MealDetailsState extends State<MealDetails> {
               if (_imageCamera == null || _revertToOriginal==true)...[
                 if (_meal.updatedImg.isEmpty || _revertToOriginal==true)...[
 
-                  if (_meal.originalImg.isEmpty)...[
+                  if (_meal.originalImg == null || _meal.originalImg.isEmpty)...[
                     SizedBox(
                       height: 200,
                       child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
