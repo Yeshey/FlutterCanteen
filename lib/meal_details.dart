@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 
 import 'constants.dart' as constants;
 import 'main.dart';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,27 +38,58 @@ class _MealDetailsState extends State<MealDetails> {
   bool _submitSuccess = false;
   String _submitErrorMessage = '';
 
-  late Meal meal;
+  late Meal _meal;
+  
+  List<CameraDescription>? _cameras; // list out the camera available
+  CameraController? _controller; // controller for camera
+  XFile? _imageCamera; // for captured image
 
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
+  late LocationData _locationData;
+  Location _location = Location();
 
-
-  List<CameraDescription>? cameras; // list out the camera available
-  CameraController? controller; // controller for camera
-  XFile? imageCamera; // for captured image
-  bool firstTime = true;
+  double _latitude = 0.0, _longitude = 0.0;
+  Future<void> _getCoordinates() async {
+    _locationData = await _location.getLocation();
+    _latitude = _locationData.latitude ?? 0.0;
+    _longitude = _locationData.longitude ?? 0.0;
+  }
 
   @override
   void initState() {
-    loadCamera();
     super.initState();
+    _loadCamera();
+    _initLocation();
   }
 
-  loadCamera() async {
-    cameras = await availableCameras();
-    if(cameras != null){
-      controller = CameraController(cameras![0], ResolutionPreset.max); //cameras[0] = first camera, change to 1 to another camera
+  Future<void> _initLocation() async {
+    _serviceEnabled = await _location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
 
-      controller!.initialize().then((_) {
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    setState(() {
+      // update screen
+    });
+  }
+
+  _loadCamera() async {
+    _cameras = await availableCameras();
+    if(_cameras != null){
+      _controller = CameraController(_cameras![0], ResolutionPreset.max); //cameras[0] = first camera, change to 1 to another camera
+
+      _controller!.initialize().then((_) {
         if (!mounted) {
           return;
         }
@@ -78,45 +112,45 @@ class _MealDetailsState extends State<MealDetails> {
       if (!_revertToOriginal){
         updatedMeal = Meal(
           thereIsAnUpdatedMeal: true,
-          weekDay: meal.weekDay,
-          originalSoup: meal.originalSoup,
-          originalFish: meal.originalFish,
-          originalMeat: meal.originalMeat,
-          originalVegetarian: meal.originalVegetarian,
-          originalDessert: meal.originalDessert,
+          weekDay: _meal.weekDay,
+          originalSoup: _meal.originalSoup,
+          originalFish: _meal.originalFish,
+          originalMeat: _meal.originalMeat,
+          originalVegetarian: _meal.originalVegetarian,
+          originalDessert: _meal.originalDessert,
           updatedSoup: _soupController.text,
           updatedFish: _fishController.text,
           updatedMeat: _meatController.text,
           updatedVegetarian: _vegetarianController.text,
           updatedDessert: _dessertController.text,
-          img: meal.img,
+          updatedImg: _meal.updatedImg,
+          originalImg: _meal.originalImg,
           submitted: false,
         );
       } else {
         updatedMeal = Meal(
           thereIsAnUpdatedMeal: true,
-          weekDay: meal.weekDay,
-          originalSoup: meal.originalSoup,
-          originalFish: meal.originalFish,
-          originalMeat: meal.originalMeat,
-          originalVegetarian: meal.originalVegetarian,
-          originalDessert: meal.originalDessert,
+          weekDay: _meal.weekDay,
+          originalSoup: _meal.originalSoup,
+          originalFish: _meal.originalFish,
+          originalMeat: _meal.originalMeat,
+          originalVegetarian: _meal.originalVegetarian,
+          originalDessert: _meal.originalDessert,
+          originalImg: _meal.originalImg,
           updatedSoup: "",
           updatedFish: "",
           updatedMeat: "",
           updatedVegetarian: "",
           updatedDessert: "",
-          img: "",
+          updatedImg: "",
           submitted: false,
         );
       }
-
-
       var imgBase64new = null;
 
-      if (imageCamera != null) {
+      if (_imageCamera != null) {
         // Read the content of the XFile object into a Uint8List
-        Uint8List imageBytes = await imageCamera?.readAsBytes() as Uint8List;
+        Uint8List imageBytes = await _imageCamera?.readAsBytes() as Uint8List;
         // Encode the Uint8List into a base64 String
         imgBase64new = imageBytes != null ? base64Encode(imageBytes) : null;
       }
@@ -139,18 +173,50 @@ class _MealDetailsState extends State<MealDetails> {
             }),
       );
 
+      bool locationSuccess = false;
+      String locationError = '';
+      //var targetLatitude = 40.192833; var targetLongitude = -8.412939;
+      final targetCoordinates = new LatLng(40.192833, -8.412939); // coordinates of cafeteria
+      await _getCoordinates(); // updates variables _latitude & _longitude
+      if (_permissionGranted == PermissionStatus.denied){
+        locationError = "Location Permission Denied, can't submit";
+      } else if (_latitude == 0.0 && _longitude == 0.0){
+        locationError = "Location Error (coordinates 0.0 0.0?)";
+      } else {
+
+        final Distance distance = new Distance();
+        final currentCoordinates = new LatLng(_latitude, _longitude);
+
+        final double distanceInMeters = distance.as(LengthUnit.Meter, currentCoordinates, targetCoordinates);
+
+        if (distanceInMeters >= 1000) { // more than 3Km away from cafeteria
+          locationError = "More than 1Km away from cafeteria, currently ${distanceInMeters}Km away, not submitting";
+        } else {
+          locationSuccess = true;
+        }
+      }
+
       if (response.statusCode == 201) { // seems like it works when its 201 and not HttpStatus.ok
-        setState(() {
-          _submitting = false;
-          _submitSuccess = true;
-          _submitErrorMessage = '';
-        });
-        Navigator.of(context).pop(_submitSuccess);
+
+        if (locationSuccess){
+          setState(() {
+            _submitting = false;
+            _submitSuccess = true;
+            _submitErrorMessage = '';
+          });
+          Navigator.of(context).pop(_submitSuccess);
+
+        } else {
+          setState(() {
+            _submitting = false;
+            _submitErrorMessage = locationError;
+          });
+        }
 
       } else {
         setState(() {
           _submitting = false;
-          _submitErrorMessage = utf8.decode(response.bodyBytes) + ' response.statusCode: ' + response.statusCode.toString();
+          _submitErrorMessage = '${utf8.decode(response.bodyBytes)} response.statusCode: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -164,12 +230,12 @@ class _MealDetailsState extends State<MealDetails> {
   @override
   Widget build(BuildContext context) {
 
-    meal = ModalRoute.of(context)!.settings.arguments as Meal;
-    _soupController.text = meal.updatedSoup;
-    _fishController.text = meal.updatedFish;
-    _meatController.text = meal.updatedMeat;
-    _vegetarianController.text = meal.updatedVegetarian;
-    _dessertController.text = meal.updatedDessert;
+    _meal = ModalRoute.of(context)!.settings.arguments as Meal;
+    _soupController.text = _meal.updatedSoup;
+    _fishController.text = _meal.updatedFish;
+    _meatController.text = _meal.updatedMeat;
+    _vegetarianController.text = _meal.updatedVegetarian;
+    _dessertController.text = _meal.updatedDessert;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
@@ -196,9 +262,10 @@ class _MealDetailsState extends State<MealDetails> {
                       onPressed: () async{
                         try {
                           _revertToOriginal = false;
-                          if(controller != null){ //check if controller is not null
-                            if(controller!.value.isInitialized){ //check if controller is initialized
-                              imageCamera = await controller!.takePicture(); //capture image
+                          if(_controller != null){ //check if controller is not null
+                            if(_controller!.value.isInitialized){ //check if controller is initialized
+                              _controller?.setFlashMode(FlashMode.off);
+                              _imageCamera = await _controller!.takePicture(); //capture image
                               setState(() {
                                 //update UI
                               });
@@ -215,22 +282,30 @@ class _MealDetailsState extends State<MealDetails> {
                 ),
               ),
 
-              if (imageCamera == null || _revertToOriginal==true)...[
-                if (meal.img.isEmpty || _revertToOriginal==true)...[
-                  SizedBox(
-                    height: 200,
-                    child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
-                  ),
+              if (_imageCamera == null || _revertToOriginal==true)...[
+                if (_meal.updatedImg.isEmpty || _revertToOriginal==true)...[
+
+                  if (_meal.originalImg.isEmpty)...[
+                    SizedBox(
+                      height: 200,
+                      child: Image.asset('images/DefaultMeal-evie-s-unsplash.jpg'),
+                    ),
+                  ]else...[
+                    SizedBox(
+                      height: 200,
+                      child: Image.network('${constants.SERVER_URL}/images/${_meal.originalImg}'),
+                    ),
+                  ]
                 ]else...[
                   SizedBox(
                     height: 200,
-                    child: Image.network('${constants.SERVER_URL}/images/${meal.img}'),
+                    child: Image.network('${constants.SERVER_URL}/images/${_meal.updatedImg}'),
                   ),
                 ],
               ]else...[
                 Container( //show captured image
                   padding: EdgeInsets.all(30),
-                  child: Image.file(File(imageCamera!.path), height: 300,), //display captured image
+                  child: Image.file(File(_imageCamera!.path), height: 300,), //display captured image
                 ),
               ],
 
@@ -267,12 +342,12 @@ class _MealDetailsState extends State<MealDetails> {
 
               children: [
 
-                if(_isVisible && (meal.thereIsAnUpdatedMeal || _isEditable))...[
-                  if(meal.originalSoup != meal.updatedSoup ||
-                      meal.originalFish != meal.updatedFish ||
-                      meal.originalMeat != meal.updatedMeat ||
-                      meal.originalVegetarian != meal.updatedVegetarian ||
-                      meal.originalDessert != meal.updatedDessert ||
+                if(_isVisible && (_meal.thereIsAnUpdatedMeal || _isEditable))...[
+                  if(_meal.originalSoup != _meal.updatedSoup ||
+                      _meal.originalFish != _meal.updatedFish ||
+                      _meal.originalMeat != _meal.updatedMeat ||
+                      _meal.originalVegetarian != _meal.updatedVegetarian ||
+                      _meal.originalDessert != _meal.updatedDessert ||
                       _isEditable
                   )...[
 
@@ -301,7 +376,7 @@ class _MealDetailsState extends State<MealDetails> {
                           ],
                         ),
 
-                        if (meal.originalSoup != meal.updatedSoup || _isEditable)...[
+                        if (_meal.originalSoup != _meal.updatedSoup || _isEditable)...[
                           const Text('Sopa: '),
                           TextFormField(
                             controller: _soupController,
@@ -311,7 +386,7 @@ class _MealDetailsState extends State<MealDetails> {
                           ),
                         ],
 
-                        if (meal.originalFish != meal.updatedFish || _isEditable)...[
+                        if (_meal.originalFish != _meal.updatedFish || _isEditable)...[
                           const Text('Prato Peixe: '),
                           TextFormField(
                             controller: _fishController,
@@ -321,7 +396,7 @@ class _MealDetailsState extends State<MealDetails> {
                           ),
                         ],
 
-                        if (meal.originalMeat != meal.updatedMeat || _isEditable)...[
+                        if (_meal.originalMeat != _meal.updatedMeat || _isEditable)...[
                           const Text('Prato Carne: '),
                           TextFormField(
                             controller: _meatController,
@@ -331,7 +406,7 @@ class _MealDetailsState extends State<MealDetails> {
                           ),
                         ],
 
-                        if (meal.originalVegetarian != meal.updatedVegetarian || _isEditable)...[
+                        if (_meal.originalVegetarian != _meal.updatedVegetarian || _isEditable)...[
                           const Text('Prato Vegetariano: '),
                           TextFormField(
                             controller: _vegetarianController,
@@ -341,7 +416,7 @@ class _MealDetailsState extends State<MealDetails> {
                           ),
                         ],
 
-                        if (meal.originalDessert != meal.updatedDessert || _isEditable)...[
+                        if (_meal.originalDessert != _meal.updatedDessert || _isEditable)...[
                           const Text('\nSobremesa: '),
                           TextFormField(
                             controller: _dessertController,
@@ -391,11 +466,11 @@ class _MealDetailsState extends State<MealDetails> {
                           ),
 
 
-                          Text('Sopa: ${meal.originalSoup}\n'),
-                          Text('Prato Peixe: ${meal.originalFish}\n'),
-                          Text('Prato Carne: ${meal.originalMeat}\n'),
-                          Text('Prato Vegetariano: ${meal.originalVegetarian}\n'),
-                          Text('Sobremesa: ${meal.originalDessert}\n'),
+                          Text('Sopa: ${_meal.originalSoup}\n'),
+                          Text('Prato Peixe: ${_meal.originalFish}\n'),
+                          Text('Prato Carne: ${_meal.originalMeat}\n'),
+                          Text('Prato Vegetariano: ${_meal.originalVegetarian}\n'),
+                          Text('Sobremesa: ${_meal.originalDessert}\n'),
                         ],
                       ),
                     ),

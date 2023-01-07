@@ -52,7 +52,8 @@ class Meal {
     required this.updatedVegetarian,
     required this.updatedDessert,
     required this.submitted,
-    required this.img
+    required this.updatedImg,
+    required this.originalImg
   });
 
   Meal.fromJson(Map<String, dynamic> json, bool recUpdatedMeal)
@@ -67,12 +68,14 @@ class Meal {
         updatedMeat = json['update']?['meat'] ?? '',
         updatedVegetarian = json['update']?['vegetarian'] ?? '',
         updatedDessert = json['update']?['desert'] ?? '',
-        img = json['update']?['img'] ?? '',
+        originalImg = json['update']?['img'] ?? '',
+        updatedImg = json['update']?['img'] ?? '',
         submitted = json['submitted'] ?? false,
         thereIsAnUpdatedMeal = recUpdatedMeal;
 
   bool thereIsAnUpdatedMeal;
-  final String img;
+  final String updatedImg;
+  final String originalImg;
   final String weekDay;
   final String originalSoup;
   final String originalFish;
