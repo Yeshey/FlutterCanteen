@@ -459,5 +459,4 @@ class _MealDetailsState extends State<MealDetails> {
       //),
     );
   }
-
 }
