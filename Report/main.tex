@@ -99,7 +99,7 @@ Neste relatório, vamos analisar o design da interface da aplicação, a abordag
 
 \section{Análise do design da interface}\label{sec:2}
 
-    A aplicação consiste apenas em dois ecrãs, Um ecrã principal com informação geral sobre as refeições e um ecrã de detalhes de cada dia.
+    A aplicação consiste apenas em dois ecrãs, um ecrã principal com informação geral sobre as refeições e um ecrã de detalhes de cada dia.
     O tempo gasto não foi muito focado no embelezamento da interface, mas foram tomados os passos necessários para que esta fosse intuitiva e não tivesse qualquer problema relativamente à interação e à mostra da informação. 
 
 	\begin{figure}[H]
@@ -119,17 +119,17 @@ Neste relatório, vamos analisar o design da interface da aplicação, a abordag
 
     Este ecrã terá uma lista infinita que mostra a informação atualizada de cada ementa de cada dia, começando pelo dia da semana em que o utilizador se encontra no acesso, caso não haja informação atualizada por qualquer utilizador, será mostrada a informação original do servidor.
 
-    A informação está guardada localmente, e é apenas atualizada quando o utilizador pressiona o botão de refresh em cima à esquerda (ou quando submete uma alteração a uma refeição). A informação localmente guardada será falada mais em detalhe na secção dos \nameref{shared_preferences}
+    A informação está guardada localmente, e é apenas utilizada quando o utilizador pressiona o botão de refresh em cima à esquerda (ou quando submete uma alteração a uma refeição). A informação localmente guardada será falada mais em detalhe na secção dos \nameref{shared_preferences}
 
     \subsection{Ecrã dos Detalhes da Refeição}
 
-    Neste ecrã é mostrado ao utilizador a foto associada à refeição, seja ela a original, uma atualizada, ou uma por defeito caso nenhuma destas exista, bem como onformação atualizada e original sobre a ementa.
+    Neste ecrã é mostrado ao utilizador a foto associada à refeição, seja ela a original, uma atualizada, ou uma por defeito caso nenhuma destas exista, bem como informação atualizada e original sobre a ementa.
 
     Há também um botão para editar a informação, um botão para repor toda a informação, incluindo a imagem, e um botão para tirar uma foto.
 
     O utilizador poderá alterar a foto, e a informação, mas a informação só será atualizada se após isso pressionar o botão "Submit Changes" e se encontrar a no mínimo 1Km da cantina do ISEC.
 
-    Devido à utilização da camara e da localização, ambas estas premissões são pedidas ao utilizador ao entrar neste ecrã.
+    Devido à utilização da câmara e da localização, ambas estas permissões são perdidas ao utilizador ao entrar neste ecrã.
 
 \section{Abordagem e Arquitetura}\label{sec:3}
 
@@ -137,7 +137,7 @@ Neste relatório, vamos analisar o design da interface da aplicação, a abordag
 
 		Como já mencionado, a tecnologia usada foi o Flutter, e o foco foi numa aplicação móvel para android.
 
-        Foi também necessário instalar um ambiente onde fosse possivel correr o servidor dado em docker para se ter acesso ao servidor. No entanto teve-se em conta as alterações feitas no servidor do professor na última semana, pelo que o trabalho que entregamos comunica diretamente com o servidor do professor: \href{http://amov.servehttp.com:8080/menu}{http://amov.servehttp.com:8080/menu}.
+        Foi também necessário instalar um ambiente onde fosse possível correr o servidor dado em docker para se ter acesso ao servidor. No entanto teve-se em conta as alterações feitas no servidor do professor na última semana, pelo que o trabalho que entregamos comunica diretamente com o servidor do professor: \href{http://amov.servehttp.com:8080/menu}{http://amov.servehttp.com:8080/menu}.
 
         Outras packages de Flutter\cite{1} usadas incluem:
 
@@ -153,13 +153,13 @@ Neste relatório, vamos analisar o design da interface da aplicação, a abordag
 
         \subsection{Estrutura de Ficheiros}
 
-        Para além da estrutura criada pelas ferramentas usadas, dividimos o projeto em três ficheiros: main.dart, meal\_details.dart, constants.dart. Se foi feita a dedução de que o ficheiro main.dart foi usado para o ecrã principal e o ficheiro meal\_details foi usado para o ecrã de detalhes de refeições, a dedução estaroia correta.
+        Para além da estrutura criada pelas ferramentas usadas, dividimos o projeto em três ficheiros: main.dart, meal\_details.dart, constants.dart. Se foi feita a dedução de que o ficheiro main.dart foi usado para o ecrã principal e o ficheiro meal\_details foi usado para o ecrã de detalhes de refeições, a dedução estaria correta.
 
         Foi criado também um ficheiro para constantes que acabou por ter apenas informação sobre o site onde se vai buscar a informação, pelo que a única informação que consta deste ficheiro é a seguinte:
         \begin{lstlisting}
 const String SERVER_URL = 'http://amov.servehttp.com:8080';
         \end{lstlisting}
-        Esta linha poderá ser fácilmente mudada para rápidamente mudar o servidor.
+        Esta linha poderá ser facilmente mudada para rapidamente mudar o servidor.
 
  
 	\subsection{Comunicação com o Servidor}
@@ -170,7 +170,7 @@ const String SERVER_URL = 'http://amov.servehttp.com:8080';
 http.Response response = await http.get(Uri.parse(_serverMenuUrl));
         \end{lstlisting}
 
-        Para postar informação, é feito atraves de um post comn toda a informação relevante da seguinte forma:
+        Para postar informação, é feito através de um post com toda a informação relevante da seguinte forma:
 
         \begin{lstlisting}[language=Dart]
   final uri = Uri.parse('${constants.SERVER_URL}/menu');
@@ -196,22 +196,22 @@ http.Response response = await http.get(Uri.parse(_serverMenuUrl));
 
         \subsection{Utilização da Câmara}
 
-        A utilização da câmara resume-se à sua inicialização e à utilização do método takePicture() para tirar uma foto quando o icon da câmara é pressionado.
+        A utilização da câmara resume-se à sua inicialização e à utilização do método takePicture() para tirar uma foto quando o ícone da câmara é pressionado.
 
-        De seguida é executado um setState() para colocar a imagem visivel na interface.
+        De seguida é executado um setState() para colocar a imagem visível na interface.
         
         \subsection{Acesso a localização e coordenadas}
 
-        O utilizador pode apenas submeter alterações às refeições da cantina se se encontrar a menos de um kilometro desta. Para este fim é utilizado o plugin location para obter as coordenadas do dispositivo e o plugin latlong2 para as tratar. 
+        O utilizador pode apenas submeter alterações às refeições da cantina se se encontrar a menos de um quilómetro desta. Para este fim é utilizado o plugin location para obter as coordenadas do dispositivo e o plugin latlong2 para as tratar. 
 
-        Se o utilizador se encontrar a mais de um kilometro da cantina, é mostrado um erro ao tentar submeter com a distância que o utilizador se encontra da cantina.
+        Se o utilizador se encontra a mais de um quilómetro da cantina, é mostrado um erro ao tentar submeter com a distância que o utilizador se encontra da cantina.
 
         \pagebreak
 
         \subsection{Dados locais (shared\_preferences)}\label{shared_preferences} 
         
 
-		A aplicação irá comunicar com o servidor apenas quando expressamente pedido pelo utilizador, mostrando apenas a informação localmente guardada em qualqeur outra situação atravez do plugin das shared\_preferences.
+		A aplicação irá comunicar com o servidor apenas quando expressamente pedido pelo utilizador, mostrando apenas a informação localmente guardada em qualquer outra situação através do plugin das shared\_preferences.
         Caso não haja qualquer informação para mostrar, o utilizador é informado.
 
 	\begin{figure}[H]
@@ -241,7 +241,7 @@ static Future<Uint8List> getMeals() async {
 
  	Foi-nos possível completar todas as tarefas propostas a este trabalho, bem como as opcionais, na sua totalidade.
 
-  Achamos que o balnço deste trabalho é positivo, pelo que aprendemos a usar uma das tecnologias mais relevantes da ária, uma vez que nos permite lançar uma aplicação para variados dispositivos e sistemas operativos com apenas uma base de código.
+  Achamos que o balanço deste trabalho é positivo, pelo que aprendemos a usar uma das tecnologias mais relevantes da área, uma vez que nos permite lançar uma aplicação para variados dispositivos e sistemas operativos com apenas uma base de código.
 
 
 % There is a better way to do the bibliography for sure
@@ -254,3 +254,4 @@ static Future<Uint8List> getMeals() async {
 \end{thebibliography}
 
 \end{document}
+
